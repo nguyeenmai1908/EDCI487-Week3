@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Section 2: Key Concepts — EDCI 487 Week 3</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<style>
+/* ══════════════════════════════════════════
+   DESIGN TOKENS
+══════════════════════════════════════════ */
+:root {
+  --forest:    #1a2e1a;
+  --near-black:#1c1a14;
+  --moss:      #4a6741;
+  --sage:      #7a9e6e;
+  --sage-pale: #deebd4;
+  --clay:      #c4622d;
+  --ember:     #e8874a;
+  --sand:      #e8d5b0;
+  --cream:     #f5f0e8;
+  --white:     #fefcf8;
+  --text:      #1a2e1a;
+  --muted:     #7a6a5a;
+  --earth:     #2a1f14;
+}
+
+/* ══════════════════════════════════════════
+   RESET + BASE
+══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  background: var(--cream);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+body::after {
+  content: '';
+  position: fixed; inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+  pointer-events: none; z-index: 999;
+}
+
+/* ══════════════════════════════════════════
+   PROGRESS BAR
+══════════════════════════════════════════ */
+.progress-bar {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 3px; background: transparent; z-index: 200;
+}
+.progress-fill {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--clay), var(--ember));
+  transition: width 0.15s ease;
+}
+
+/* ══════════════════════════════════════════
+   SIDEBAR
+══════════════════════════════════════════ */
+.sidebar {
+  position: fixed; top: 0; left: 0;
+  width: 220px; height: 100vh;
+  background: #2f4a2f;
+  border-right: 1px solid rgba(122,158,110,0.2);
+  z-index: 100;
+  display: flex; flex-direction: column;
+  padding: 2rem 0; overflow-y: auto;
+}
+
+.sidebar-logo {
+  font-size: 0.68rem; letter-spacing: 0.22em;
+  text-transform: uppercase; color: rgba(122,158,110,0.5);
+  padding: 0 1.5rem 1.5rem;
+  border-bottom: 1px solid rgba(122,158,110,0.1);
+  margin-bottom: 1.5rem; line-height: 1.6;
+}
+
+.nav-item {
+  display: flex; align-items: flex-start; gap: 0.6rem;
+  padding: 0.7rem 1.5rem; text-decoration: none;
+  border-left: 3px solid transparent;
+  transition: all 0.2s; cursor: pointer;
+}
+.nav-item:hover { background: rgba(245,240,232,0.04); }
+.nav-item.active {
+  border-left-color: var(--clay);
+}
+.nav-num {
+  font-size: 0.68rem; font-weight: 500;
+  color: rgba(245,240,232,0.25); flex-shrink: 0; margin-top: 2px;
+}
+.nav-item.active .nav-num { color: var(--clay); }
+.nav-label {
+  font-size: 0.75rem; font-weight: 300;
+  line-height: 1.4; color: rgba(245,240,232,0.35);
+}
+.nav-item.active .nav-label { color: var(--cream); font-weight: 500; }
+
+/* ══════════════════════════════════════════
+   MAIN
+══════════════════════════════════════════ */
+.main { margin-left: 220px; min-height: 100vh; }
+
+.block-inner {
+  width: min(980px, 100%);
+  margin: 0 auto;
+}
+
+.flipcards-section .block-inner {
+  width: min(1320px, 100%);
+}
+
+/* ══════════════════════════════════════════
+   BLOCK 1: SECTION HEADER
+══════════════════════════════════════════ */
+.section-header {
+  background: var(--forest);
+  padding: 2.5rem 3rem;
+}
+
+.section-header-row {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: left;
+}
+.sh-number {
+  font-family: 'Playfair Display', serif;
+  font-size: 10rem; font-weight: 900;
+  color: rgba(255,255,255,0.2);
+  line-height: 1; flex-shrink: 0; user-select: none;
+}
+.sh-center { flex: 1; }
+.sh-label {
+  font-size: 1rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--clay); margin-bottom: 0.35rem;
+}
+.sh-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 2.8rem; font-weight: 700;
+  color: var(--cream); line-height: 1.25;
+}
+.sh-time {
+  font-size: 0.78rem; letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(245,240,232,0.28);
+  flex-shrink: 0; align-self: center;
+}
+
+/* ══════════════════════════════════════════
+   BLOCK 2: OBJECTIVE CALLOUT
+══════════════════════════════════════════ */
+.obj-callout {
+  background: var(--sage-pale);
+  border-left: 3px solid var(--sage);
+  padding: 1.25rem 3rem;
+}
+.obj-callout p {
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: 1rem;
+  color: #2d5a27; line-height: 1.65;
+}
+
+/* ══════════════════════════════════════════
+   BLOCK 3: INTRO TEXT
+══════════════════════════════════════════ */
+.intro-block {
+  background: var(--cream);
+  padding: 3.5rem 3rem 2.5rem;
+}
+.intro-block h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+  font-weight: 700; color: var(--forest);
+  margin-bottom: 1.25rem; line-height: 1.2;
+}
+.intro-block p {
+  font-size: 1rem; line-height: 1.85;
+  color: rgba(26,46,26,0.75);
+  margin-bottom: 0.85rem;
+}
+.intro-block p:last-child { margin-bottom: 0; }
+
+/* ══════════════════════════════════════════
+   BLOCK 4: FLIP CARDS — near-black bg
+   CHANGE 1: dark bg so amber pops
+══════════════════════════════════════════ */
+.flipcards-section {
+  background: var(--near-black);
+  padding: 3rem 3rem 3rem;
+}
+
+.cards-counter {
+  font-size: 0.78rem; letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(245,240,232,0.3);
+  margin-bottom: 2rem;
+}
+.counter-num {
+  color: var(--ember); font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1.1rem;
+  align-items: stretch;
+  justify-content: stretch;
+}
+
+/* CHANGE 2: taller cards, all equal */
+.flip-card {
+  perspective: 1200px;
+  height: clamp(280px, 32vw, 360px);
+  min-height: 280px;
+  width: 100%;
+  cursor: pointer;
+  display: block;
+}
+.flip-card-inner {
+  position: relative; width: 100%; height: 100%;
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.flip-card.flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-front, .flip-back {
+  position: absolute; inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 12px; overflow: hidden;
+}
+
+/* CHANGE 1+3: amber front with subtle ring pattern */
+.flip-front {
+  background: linear-gradient(150deg, #f09560, var(--ember) 60%, #c96a25);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: space-between;
+  padding: 2rem 1.25rem 1.2rem;
+  text-align: center; position: relative;
+  transition: filter 0.2s;
+  overflow: hidden;
+}
+
+/* CHANGE 3: subtle ring texture on card front */
+.flip-front::before {
+  content: '';
+  position: absolute;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.12);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.flip-front::after {
+  content: '';
+  position: absolute;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.06);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.flip-card:hover .flip-front {
+  filter: brightness(1.08);
+}
+
+.card-icon {
+  font-size: 2.8rem; margin-bottom: 1.35rem;
+  position: relative; z-index: 1;
+  filter: drop-shadow(0 3px 12px rgba(0,0,0,0.15));
+}
+.card-term {
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: 1.05rem;
+  font-weight: 700; color: var(--forest);
+  line-height: 1.3; position: relative; z-index: 1;
+  margin-bottom: 1.5rem;
+}
+.card-hint {
+  position: relative;
+  font-size: 0.66rem; letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.7);
+  z-index: 1;
+  margin-top: auto;
+}
+
+/* back face — slightly warmer white */
+.flip-back {
+  background: var(--cream);
+  transform: rotateY(180deg);
+  padding: 1.5rem 1.25rem 1rem;
+  border: 1px solid rgba(26,46,26,0.08);
+  display: flex; flex-direction: column;
+  overflow-y: auto;
+}
+.back-tag {
+  font-size: 0.64rem; letter-spacing: 0.2em;
+  text-transform: uppercase; color: var(--clay);
+  margin-bottom: 0.35rem; font-weight: 500;
+}
+/* CHANGE 2: slightly larger back text */
+.back-text {
+  font-size: 0.85rem; line-height: 1.65;
+  color: var(--forest); margin-bottom: 1rem;
+}
+.back-footnote {
+  font-size: 0.8rem; font-style: italic;
+  line-height: 1.55; color: rgba(42,31,20,0.38);
+  margin-top: auto; padding-top: 0.6rem;
+  border-top: 1px solid var(--sand);
+}
+
+/* ══════════════════════════════════════════
+   BLOCK 5: BRIDGE — pull quote style
+   CHANGE 4: centred pull quote, no box
+══════════════════════════════════════════ */
+.bridge-block {
+  background: var(--cream);
+  padding: 5rem 3rem;
+  text-align: left;
+  position: relative;
+}
+.bridge-block::before {
+  content: '\201C';
+  font-family: 'Playfair Display', serif;
+  font-size: 8rem; font-weight: 900;
+  color: rgba(196,98,45,0.1);
+  position: absolute; top: 1rem; left: 50%;
+  transform: translateX(-50%);
+  line-height: 1; pointer-events: none;
+  user-select: none;
+}
+.bridge-quote {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: clamp(1.2rem, 2.5vw, 1.65rem);
+  font-weight: 400; line-height: 1.6;
+  color: var(--forest);
+  margin: 0 0 1.25rem 0; position: relative; z-index: 1;
+}
+.bridge-attr {
+  font-size: 1rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--clay);
+  position: relative; z-index: 1;
+}
+
+/* ══════════════════════════════════════════
+   BLOCK 6: HEAT DOME CASE
+   CHANGE 5: editorial stat numbers
+   CHANGE 6: lifted reflection card
+══════════════════════════════════════════ */
+.case-section {
+  background: var(--forest);
+  padding: 5rem 3rem;
+  position: relative; overflow: hidden;
+}
+.case-section::before {
+  content: '';
+  position: absolute; bottom: -80px; right: -80px;
+  width: 400px; height: 400px; border-radius: 50%;
+  background: radial-gradient(circle, rgba(196,98,45,0.07), transparent 65%);
+  pointer-events: none;
+}
+
+.case-inner { max-width: 820px; position: relative; z-index: 1; }
+
+.case-eyebrow {
+  font-size: 1rem; letter-spacing: 0.08em;
+  text-transform: uppercase; color: var(--clay);
+  margin-bottom: 0.5rem;
+}
+.case-heading {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  color: var(--cream);
+  margin-bottom: 2.5rem;
+  line-height: 1.15;
+}
+
+/* CHANGE 5: editorial stat layout */
+.case-stats {
+  display: flex; gap: 3rem;
+  margin-bottom: 2.5rem;
+  padding-bottom: 2.5rem;
+  border-bottom: 1px solid rgba(122,158,110,0.15);
+}
+.case-stat {
+  flex: 1;
+  min-width: 0;
+}
+.case-stat-num {
+  font-family: 'DM Sans', sans-serif;
+  font-size: clamp(2.6rem, 5vw, 3.8rem);
+  font-weight: 700;
+  color: var(--clay);
+  line-height: 1;
+}
+.case-stat-label {
+  font-size: 0.78rem; line-height: 1.5;
+  color: rgba(245,240,232,0.5);
+  margin-top: 0.4rem;
+  max-width: none;
+}
+
+.case-text {
+  font-size: 1rem; line-height: 1.95;
+  color: rgba(245,240,232,0.75);
+  margin-bottom: 0;
+}
+.case-text em {
+  color: var(--cream); font-style: normal; font-weight: 400;
+}
+
+/* CHANGE 6: lifted card reflection */
+.reflect-wrap {
+  background: var(--cream);
+  padding: 2.25rem 2.5rem;
+  margin-top: 3rem;
+  box-shadow: 0 8px 40px rgba(0,0,0,0.25),
+              0 2px 8px rgba(0,0,0,0.15);
+  border-radius: 12px;
+  position: relative;
+}
+.reflect-wrap::before {
+  content: '✦';
+  position: absolute; top: -0.7rem; left: 2.5rem;
+  background: var(--clay); color: white;
+  font-size: 0.62rem; padding: 0.25rem 0.5rem;
+  letter-spacing: 0.1em;
+}
+.reflect-label {
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: 0.9rem;
+  color: var(--clay); margin-bottom: 0.6rem;
+}
+.reflect-q {
+  font-family: 'Playfair Display', serif;
+  font-style: italic;
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  color: var(--forest); line-height: 1.65;
+  margin-bottom: 1.25rem;
+}
+textarea {
+  width: 100%; min-height: 95px;
+  background: var(--white);
+  border: 1px solid rgba(26,46,26,0.12);
+  padding: 0.9rem 1.1rem;
+  font-family: 'DM Sans', sans-serif;
+  font-style: italic; font-size: 0.9rem;
+  color: var(--forest); resize: vertical;
+  outline: none; transition: border-color 0.2s;
+  line-height: 1.7; border-radius: 12px;
+}
+textarea:focus { border-color: var(--clay); }
+textarea::placeholder { color: rgba(26,46,26,0.28); }
+.reflect-note {
+  margin-top: 0.6rem; font-size: 0.82rem;
+  font-style: italic; color: var(--muted);
+}
+
+/* ══════════════════════════════════════════
+   CONTINUE BAR
+══════════════════════════════════════════ */
+.continue-bar {
+  background: var(--moss);
+  padding: 5rem 3.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 3rem;
+  position: relative;
+  overflow: hidden;
+  border-top: 1px solid rgba(122,158,110,0.12);
+}
+.continue-bar::after {
+  content: '';
+  position: absolute;
+  right: -100px;
+  top: -100px;
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  background: rgba(26,46,26,0.3);
+  pointer-events: none;
+}
+.continue-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 3rem;
+  position: relative;
+  z-index: 1;
+  width: 100%;
+}
+.continue-hint {
+  font-family: 'Playfair Display', serif;
+  font-style: italic; font-size: 1rem;
+  color: var(--sage); line-height: 1.6; max-width: 380px;
+}
+.continue-btn {
+  display: inline-flex; align-items: center; gap: 0.75rem;
+  background: var(--clay); color: white; border: none; border-radius: 12px;
+  padding: 1.1rem 2.5rem;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 0.85rem; font-weight: 500;
+  letter-spacing: 0.12em; text-transform: uppercase;
+  cursor: pointer; transition: background 0.25s ease, transform 0.25s ease; flex-shrink: 0;
+  text-decoration: none;
+}
+.continue-btn:hover { background: var(--ember); transform: translateX(4px); }
+.btn-arrow {
+  width: 20px; height: 1px; background: currentColor;
+  position: relative; transition: width 0.25s ease; flex-shrink: 0;
+}
+.continue-btn:hover .btn-arrow { width: 28px; }
+.btn-arrow::after {
+  content: ''; position: absolute; right: 0; top: -3px;
+  width: 6px; height: 6px;
+  border-right: 1px solid currentColor;
+  border-top: 1px solid currentColor;
+  transform: rotate(45deg);
+}
+
+/* ══════════════════════════════════════════
+   SCROLL ANIMATIONS
+══════════════════════════════════════════ */
+.reveal {
+  opacity: 0; transform: translateY(18px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+.reveal-stagger > * {
+  opacity: 0; transform: translateY(16px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+.reveal-stagger.visible > *:nth-child(1){transition-delay:0.05s}
+.reveal-stagger.visible > *:nth-child(2){transition-delay:0.15s}
+.reveal-stagger.visible > *:nth-child(3){transition-delay:0.25s}
+.reveal-stagger.visible > *:nth-child(4){transition-delay:0.35s}
+.reveal-stagger.visible > *:nth-child(5){transition-delay:0.45s}
+.reveal-stagger.visible > * { opacity: 1; transform: translateY(0); }
+
+/* ══════════════════════════════════════════
+   RESPONSIVE
+══════════════════════════════════════════ */
+@media (max-width: 1100px) {
+  .cards-grid { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 900px) {
+  .cards-grid { grid-template-columns: repeat(2, 1fr); }
+  .case-stats { gap: 2rem; }
+}
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .section-header, .obj-callout, .intro-block,
+  .flipcards-section, .bridge-block,
+  .case-section, .continue-bar {
+    padding-left: 1.5rem; padding-right: 1.5rem;
+  }
+  .cards-grid { grid-template-columns: repeat(2, 1fr); }
+  .flip-card { height: 300px; }
+  .continue-row { flex-direction: column; align-items: flex-start; }
+  .case-stats { flex-direction: column; gap: 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">EDCI 487<br>Climate Change Education<br>Week 3</div>
+  <a class="nav-item" href="week3-intro.html">
+    <span class="nav-num">↑</span>
+    <span class="nav-label">Intro &amp; Overview</span>
+  </a>
+  <a class="nav-item" href="section1.html#section1">
+    <span class="nav-num">01</span>
+    <span class="nav-label">Why Your Neighborhood Matters</span>
+  </a>
+  <a class="nav-item active" href="section2.html">
+    <span class="nav-num">02</span>
+    <span class="nav-label">The Language of Climate Justice</span>
+  </a>
+  <a class="nav-item" href="section3.html">
+    <span class="nav-num">03</span>
+    <span class="nav-label">What the Research Confirms</span>
+  </a>
+  <a class="nav-item" href="section4.html">
+    <span class="nav-num">04</span>
+    <span class="nav-label">Explore Your Community</span>
+  </a>
+  <a class="nav-item" href="section5.html">
+    <span class="nav-num">05</span>
+    <span class="nav-label">Classroom Connection</span>
+  </a>
+</aside>
+
+<main class="main">
+
+  <!-- BLOCK 1: Section Header -->
+  <div class="section-header">
+    <div class="block-inner section-header-row">
+      <div class="sh-number">02</div>
+      <div class="sh-center">
+        <div class="sh-label">Section 2 of 5</div>
+        <div class="sh-title">The Language of Climate Justice</div>
+      </div>
+      <div class="sh-time">8 min</div>
+    </div>
+  </div>
+
+  <!-- BLOCK 2: Objective Callout -->
+  <div class="obj-callout">
+    <div class="block-inner">
+    <p>By the end of this section, you'll have language for what you've always sensed — but couldn't quite name.</p>
+    </div>
+  </div>
+
+  <!-- BLOCK 3: Intro Text -->
+  <div class="intro-block reveal">
+    <div class="block-inner">
+      <h2>Five concepts. Five lenses.</h2>
+      <p>In Section 1, you started noticing. Now let's name what you saw. These five concepts give language to patterns that many people feel but struggle to articulate — and they'll be your lenses for everything that follows.</p>
+      <p>Explore each card. Flip it to see what the concept means and why it matters. We'll put them all together at the end.</p>
+    </div>
+  </div>
+
+  <!-- BLOCK 4: Flip Cards -->
+  <div class="flipcards-section">
+    <div class="block-inner">
+      <div class="cards-counter reveal">
+        <span class="counter-num" id="flipped-count">0</span> of 5 explored
+      </div>
+
+      <div class="cards-grid reveal-stagger">
+
+      <div class="flip-card" onclick="flipCard(this,0)">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="card-icon">🌳</div>
+            <div class="card-term">Tree Equity</div>
+            <div class="card-hint">Tap to explore →</div>
+          </div>
+          <div class="flip-back">
+            <div class="back-tag">What it means</div>
+            <div class="back-text">The fair distribution of urban trees and green spaces across all neighborhoods — regardless of income, race, or location. Everyone has a voice in decisions about their community's green spaces.</div>
+            <div class="back-tag">Why it matters</div>
+            <div class="back-text">Trees cool the air by up to 10°C on hot days, filter pollution, reduce flooding, and improve mental health. When some neighborhoods have trees and others don't, the health gap is real.</div>
+            <div class="back-footnote">In Pawtucket, a free tree-planting program existed — but only residents of already-green neighborhoods applied. The people who needed trees most didn't know it existed.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card" onclick="flipCard(this,1)">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="card-icon">⚖️</div>
+            <div class="card-term">Environmental Racism</div>
+            <div class="card-hint">Tap to explore →</div>
+          </div>
+          <div class="flip-back">
+            <div class="back-tag">What it means</div>
+            <div class="back-text">The pattern where racialized communities disproportionately bear environmental burdens — pollution, extreme heat, lack of green space — while having less power over decisions that affect their environment.</div>
+            <div class="back-tag">Why it matters</div>
+            <div class="back-text">This isn't accidental. It's the result of decades of policies — redlining, highway placement, zoning laws — that concentrated environmental harm in specific communities. History shaped who is most vulnerable today.</div>
+            <div class="back-footnote">Across five Canadian cities, Nature Canada found that low-income and racialized neighborhoods consistently had less tree canopy. Not by chance. By design.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card" onclick="flipCard(this,2)">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="card-icon">🔗</div>
+            <div class="card-term">Intersectionality</div>
+            <div class="card-hint">Tap to explore →</div>
+          </div>
+          <div class="flip-back">
+            <div class="back-tag">What it means</div>
+            <div class="back-text">A framework for understanding how different aspects of identity — race, income, gender, disability, age — overlap and combine to shape people's experiences of climate harm.</div>
+            <div class="back-tag">Why it matters</div>
+            <div class="back-text">Climate change doesn't affect everyone equally. A low-income elderly person with a disability faces different — and often greater — risks during a heat wave than a young, wealthy, able-bodied person.</div>
+            <div class="back-footnote">During the 2021 BC heat dome, most deaths occurred among elderly people living alone, without AC, in low-income neighborhoods with less tree cover. Age, income, housing, and neighborhood all intersected.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card" onclick="flipCard(this,3)">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="card-icon">🌡️</div>
+            <div class="card-term">Climate Apartheid</div>
+            <div class="card-hint">Tap to explore →</div>
+          </div>
+          <div class="flip-back">
+            <div class="back-tag">What it means</div>
+            <div class="back-text">A world where the wealthy can pay to escape the worst impacts of climate change — moving to cooler areas, buying air conditioning — while those with fewer resources suffer consequences they did the least to cause.</div>
+            <div class="back-tag">Why it matters</div>
+            <div class="back-text">The communities that contributed most to the problem often have the most resources to adapt. Those who contributed least are most exposed and least able to cope. That's not a side effect — it's a justice crisis.</div>
+            <div class="back-footnote">The UN Special Rapporteur on extreme poverty warned of a scenario where the wealthy pay to escape overheating, hunger, and conflict while the rest of the world is left to suffer.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flip-card" onclick="flipCard(this,4)">
+        <div class="flip-card-inner">
+          <div class="flip-front">
+            <div class="card-icon">🪶</div>
+            <div class="card-term">Environmental Colonialism</div>
+            <div class="card-hint">Tap to explore →</div>
+          </div>
+          <div class="flip-back">
+            <div class="back-tag">What it means</div>
+            <div class="back-text">Patterns where powerful groups make decisions about land, resources, and environments without the consent — or against the interests — of the people who live there. It connects historical colonialism to ongoing environmental injustices.</div>
+            <div class="back-tag">Why it matters</div>
+            <div class="back-text">In Canada, Indigenous communities were displaced from their lands and continue to face resource extraction imposed without meaningful consent. Climate solutions that ignore this history risk repeating it.</div>
+            <div class="back-footnote">The Nature Canada report calls for decolonizing urban forestry by centering Indigenous communities as partners and knowledge-holders in greening initiatives.</div>
+          </div>
+        </div>
+      </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- BLOCK 5: Bridge — pull quote -->
+  <div class="bridge-block reveal">
+    <div class="block-inner">
+      <p class="bridge-quote">These five concepts don't exist in isolation. In real communities, they overlap and compound — the same neighborhood can experience all of them at once.</p>
+      <div class="bridge-attr">The 2021 BC heat dome made that visible in a devastating way</div>
+    </div>
+  </div>
+
+  <!-- BLOCK 6: Heat Dome Case + Reflection -->
+  <div class="case-section reveal">
+    <div class="case-inner block-inner">
+
+      <div class="case-eyebrow">Case Snapshot</div>
+      <h2 class="case-heading">BC, June 2021.</h2>
+
+      <!-- CHANGE 5: editorial stat numbers -->
+      <div class="case-stats">
+        <div class="case-stat">
+          <div class="case-stat-num">49°C</div>
+          <div class="case-stat-label">Peak temperature recorded in some BC communities</div>
+        </div>
+        <div class="case-stat">
+          <div class="case-stat-num">~600</div>
+          <div class="case-stat-label">People died over five days of extreme heat</div>
+        </div>
+        <div class="case-stat">
+          <div class="case-stat-num">5</div>
+          <div class="case-stat-label">Days the heat dome lasted over British Columbia</div>
+        </div>
+      </div>
+
+      <p class="case-text">The majority of those who died were <em>elderly</em>, living alone, in older buildings without air conditioning, in low-income neighborhoods with little tree canopy. They were the people least responsible for the crisis. They paid the highest price.</p>
+
+      <!-- CHANGE 6: lifted card reflection -->
+      <div class="reflect-wrap">
+        <div class="reflect-label">Before you continue</div>
+        <div class="reflect-q">You've just explored five concepts. Looking at this story — which one stands out most to you, and why?</div>
+        <textarea placeholder="There's no wrong answer here — just your honest first thought."></textarea>
+        <div class="reflect-note">Your response won't be submitted — this is just for you, to help you arrive at class with something to say.</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- BLOCK 7: Continue Bar -->
+  <div class="continue-bar reveal">
+    <div class="block-inner continue-row">
+      <div class="continue-hint">You have the language.<br>Now let's see what the data shows.</div>
+      <a class="continue-btn" href="section3.html">
+        Section 3: The Data
+        <span class="btn-arrow"></span>
+      </a>
+    </div>
+  </div>
+
+</main>
+
+<script>
+// ── FLIP CARDS ──
+const flipped = [false,false,false,false,false];
+
+function flipCard(card, index) {
+  card.classList.toggle('flipped');
+  if (!flipped[index]) {
+    flipped[index] = true;
+    document.getElementById('flipped-count').textContent =
+      flipped.filter(Boolean).length;
+  }
+}
+
+// ── SCROLL REVEAL ──
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      observer.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08 });
+
+document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => observer.observe(el));
+
+// ── PROGRESS BAR ──
+window.addEventListener('scroll', () => {
+  const pct = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
+  document.getElementById('progress').style.width = pct + '%';
+});
+</script>
+</body>
+</html>

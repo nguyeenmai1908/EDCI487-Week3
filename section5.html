@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Section 5: Classroom Connection — EDCI 487</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --forest: #1a2e1a;
+      --near-black: #1c1a14;
+      --cream: #f5f0e8;
+      --sand: #e8d5b0;
+      --clay: #c4622d;
+      --ember: #e8874a;
+      --sage: #7a9e6e;
+      --sage-soft: #deebd4;
+      --text: #1a2e1a;
+      --earth: #2a1f14;
+      --muted: #7a6a5a;
+      --white: #fefcf8;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "DM Sans", sans-serif;
+      font-weight: 300;
+      background: var(--cream);
+      color: var(--text);
+      overflow-x: hidden;
+    }
+
+    body::after {
+      content: "";
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .sidebar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 220px;
+      height: 100vh;
+      background: #2f4a2f;
+      border-right: 1px solid rgba(122, 158, 110, 0.2);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      padding: 2rem 0;
+      overflow-y: auto;
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .sidebar-logo {
+      font-size: 0.68rem;
+      letter-spacing: 0.22em;
+      text-transform: uppercase;
+      color: rgba(122, 158, 110, 0.5);
+      padding: 0 1.5rem 1.5rem;
+      border-bottom: 1px solid rgba(122, 158, 110, 0.1);
+      margin-bottom: 1.5rem;
+      line-height: 1.6;
+    }
+
+    .sidebar-nav {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      padding: 0.7rem 1.5rem;
+      border-left: 3px solid transparent;
+      text-decoration: none;
+      transition: background 0.2s ease, color 0.2s ease;
+      cursor: pointer;
+    }
+
+    .nav-item:hover { background: rgba(245, 240, 232, 0.04); }
+
+    .nav-item.active {
+      border-left-color: var(--clay);
+    }
+
+    .nav-num {
+      font-size: 0.68rem;
+      font-weight: 500;
+      color: rgba(245, 240, 232, 0.25);
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .nav-item.active .nav-num { color: var(--clay); }
+
+    .nav-label {
+      font-size: 0.75rem;
+      font-weight: 300;
+      line-height: 1.4;
+      color: rgba(245, 240, 232, 0.35);
+    }
+
+    .nav-item.active .nav-label {
+      color: var(--cream);
+      font-weight: 500;
+    }
+
+    .page-layout {
+      margin-left: 220px;
+      min-height: 100vh;
+    }
+
+    .block-inner {
+      width: min(1040px, calc(100% - 6rem));
+      margin: 0 auto;
+    }
+
+    .section-header {
+      background: var(--forest);
+      padding: 2.5rem 0;
+    }
+
+    .section-header-row {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .sh-number {
+      font-family: "Playfair Display", serif;
+      font-size: 10rem;
+      font-weight: 900;
+      line-height: 1;
+      color: rgba(255, 255, 255, 0.18);
+      flex-shrink: 0;
+      user-select: none;
+    }
+
+    .sh-center { flex: 1; }
+
+    .sh-label {
+      margin-bottom: 0.35rem;
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--clay);
+    }
+
+    .sh-title {
+      font-family: "Playfair Display", serif;
+      font-size: 2.8rem;
+      line-height: 1.2;
+      color: var(--cream);
+    }
+
+    .sh-time {
+      font-size: 0.78rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(245, 240, 232, 0.28);
+      flex-shrink: 0;
+    }
+
+    .obj-callout {
+      background: var(--sage-soft);
+      border-left: 3px solid var(--sage);
+      padding: 1.25rem 0;
+    }
+
+    .obj-callout p {
+      max-width: none;
+      width: 100%;
+      font-family: "Playfair Display", serif;
+      font-style: italic;
+      font-size: 1rem;
+      line-height: 1.65;
+      color: #2d5a27;
+    }
+
+    .pivot-block {
+      background: var(--cream);
+      padding: 4.25rem 0 4rem;
+    }
+
+    .pivot-copy {
+      max-width: none;
+      width: 100%;
+    }
+
+    .pivot-copy p {
+      font-size: 1.15rem;
+      line-height: 1.95;
+      color: rgba(26, 46, 26, 0.78);
+      margin-bottom: 1.5rem;
+    }
+
+    .pivot-question {
+      margin-top: 2.5rem;
+      max-width: none;
+      width: 100%;
+      font-family: "Playfair Display", serif;
+      font-style: italic;
+      font-size: clamp(1.1rem, 2.2vw, 1.4rem);
+      line-height: 1.35;
+      color: var(--clay);
+    }
+
+    .quote-block {
+      background: var(--forest);
+      padding: 5.5rem 0;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .quote-block::before {
+      content: "";
+      position: absolute;
+      inset: auto -10% -120px auto;
+      width: 420px;
+      height: 420px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(196, 98, 45, 0.14), transparent 68%);
+      pointer-events: none;
+    }
+
+    .quote-mark {
+      font-family: "Playfair Display", serif;
+      font-size: 5rem;
+      line-height: 1;
+      color: var(--clay);
+      margin-bottom: 0.5rem;
+    }
+
+    .quote-text {
+      max-width: none;
+      width: 100%;
+      margin: 0 auto;
+      font-family: "Playfair Display", serif;
+      font-style: italic;
+      font-size: clamp(1.2rem, 2.5vw, 1.65rem);
+      font-weight: 400;
+      line-height: 1.6;
+      color: var(--cream);
+    }
+
+    .quote-attribution {
+      margin-top: 1.5rem;
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--clay);
+    }
+
+    .quote-prompt {
+      margin-top: 3rem;
+      font-size: 1.15rem;
+      line-height: 1.95;
+      color: rgba(245, 240, 232, 0.78);
+    }
+
+    .tension-tiles {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1rem;
+      max-width: 42rem;
+      margin: 1.5rem auto 0;
+    }
+
+    .tension-tile {
+      border: 1px solid rgba(122, 158, 110, 0.28);
+      background: rgba(255, 255, 255, 0.04);
+      border-radius: 12px;
+      color: var(--cream);
+      padding: 1.1rem 1.2rem;
+      font: inherit;
+      font-size: 1.15rem;
+      line-height: 1.95;
+      cursor: pointer;
+      transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
+    }
+
+    .tension-tile:hover,
+    .tension-tile:focus-visible {
+      outline: none;
+      transform: translateY(-2px);
+      border-color: rgba(232, 135, 74, 0.56);
+      background: rgba(255, 255, 255, 0.08);
+    }
+
+    .tile-response {
+      min-height: 1.6rem;
+      margin-top: 1.25rem;
+      font-size: 0.95rem;
+      color: var(--sand);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .tile-response.is-visible { opacity: 1; }
+
+    .sparks-block {
+      background: var(--cream);
+      padding: 4.75rem 0 5rem;
+    }
+
+    .section-kicker {
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--clay);
+      margin-bottom: 0.8rem;
+    }
+
+    .sparks-heading {
+      font-family: "Playfair Display", serif;
+      font-size: clamp(2rem, 3.8vw, 3rem);
+      line-height: 1.15;
+      color: var(--forest);
+    }
+
+    .sparks-sub {
+      max-width: none;
+      width: 100%;
+      margin-top: 1rem;
+      font-size: 1.02rem;
+      line-height: 1.85;
+      color: rgba(26, 46, 26, 0.72);
+    }
+
+    .sparks-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 1.25rem;
+      margin-top: 2.25rem;
+    }
+
+    .spark-card {
+      border: 1px solid rgba(122, 106, 90, 0.16);
+      background: rgba(255, 255, 255, 0.56);
+      padding: 1.6rem 1.5rem 1.7rem;
+      position: relative;
+      overflow: hidden;
+      border-radius: 12px;
+      opacity: 0;
+      transform: translateY(14px);
+      animation: sparkCardIn 0.55s ease forwards;
+    }
+
+    .spark-card:nth-child(1) { animation-delay: 0.08s; }
+    .spark-card:nth-child(2) { animation-delay: 0.2s; }
+    .spark-card:nth-child(3) { animation-delay: 0.32s; }
+    .spark-card:nth-child(4) { animation-delay: 0.44s; }
+
+    @keyframes sparkCardIn {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .spark-card::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: var(--clay);
+    }
+
+    .spark-card.local::before { background: #3d2b1f; }
+    .spark-card.story::before { background: #4a6741; }
+    .spark-card.why::before { background: #c4622d; }
+    .spark-card.change::before { background: #1a2e1a; }
+
+    .spark-head {
+      display: flex;
+      align-items: center;
+      gap: 0.7rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .spark-icon {
+      width: 36px;
+      height: 36px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--forest);
+      flex-shrink: 0;
+      border-radius: 50%;
+      background: var(--cream);
+    }
+
+    .spark-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--forest);
+    }
+
+    .spark-card p {
+      font-size: 1rem;
+      line-height: 1.82;
+      color: rgba(26, 46, 26, 0.74);
+    }
+
+    .reflection-block {
+      background: var(--sand);
+      padding: 4.75rem 0 5rem;
+    }
+
+    .reflection-card {
+      max-width: none;
+      width: 100%;
+      border-radius: 12px;
+    }
+
+    .reflection-heading {
+      font-family: "Playfair Display", serif;
+      font-style: italic;
+      font-size: clamp(2rem, 4vw, 3rem);
+      line-height: 1.15;
+      color: var(--earth);
+    }
+
+    .reflection-prompt {
+      margin-top: 1.25rem;
+      font-size: 1.04rem;
+      line-height: 1.92;
+      color: rgba(42, 31, 20, 0.82);
+      white-space: pre-line;
+    }
+
+    .response-frame {
+      margin-top: 1.6rem;
+      padding: 1.15rem 1.2rem 1rem;
+      border: 1px solid rgba(254, 252, 248, 0.95);
+      border-radius: 12px;
+      background: var(--white);
+    }
+
+    .response-label {
+      margin-bottom: 0.7rem;
+      font-size: 0.9rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--clay);
+      font-weight: 500;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 170px;
+      padding: 1rem 1.1rem;
+      border: 1px solid rgba(61, 43, 31, 0.18);
+      border-radius: 12px;
+      background: #f5f0e8;
+      color: var(--earth);
+      font: inherit;
+      font-size: 1rem;
+      line-height: 1.7;
+      resize: vertical;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: var(--clay);
+      box-shadow: 0 0 0 3px rgba(196, 98, 45, 0.12);
+    }
+
+    textarea::placeholder {
+      color: rgba(42, 31, 20, 0.42);
+    }
+
+    .reflection-actions {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      column-gap: 1rem;
+      row-gap: 0.5rem;
+      margin-top: 0.85rem;
+    }
+
+    .submit-button {
+      border: 0;
+      border-radius: 12px;
+      background: var(--clay);
+      color: var(--white);
+      padding: 0.9rem 1.2rem;
+      font: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.2s ease;
+    }
+
+    .submit-button:hover,
+    .submit-button:focus-visible {
+      outline: none;
+      background: #af5220;
+      transform: translateY(-1px);
+    }
+
+    .copy-message {
+      grid-column: 1 / -1;
+      font-size: 0.9rem;
+      line-height: 1.55;
+      color: rgba(42, 31, 20, 0.78);
+      min-height: 0;
+    }
+
+    .private-note {
+      align-self: center;
+      font-size: 0.94rem;
+      line-height: 1.7;
+      font-style: italic;
+      color: rgba(42, 31, 20, 0.56);
+    }
+
+    .closing-block {
+      background: #4a6741;
+      padding: 3.5rem 3.5rem;
+      border-top: 1px solid rgba(122, 158, 110, 0.12);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .closing-block::after {
+      content: "";
+      position: absolute;
+      right: -100px;
+      top: -100px;
+      width: 400px;
+      height: 400px;
+      border-radius: 50%;
+      background: rgba(26, 46, 26, 0.3);
+      pointer-events: none;
+    }
+
+    .closing-block .block-inner {
+      width: 100%;
+      max-width: none;
+    }
+
+    .closing-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 3rem;
+      position: relative;
+      z-index: 1;
+      width: 100%;
+    }
+
+    .closing-left {
+      max-width: 620px;
+      text-align: left;
+    }
+
+    .closing-line {
+      font-family: "Playfair Display", serif;
+      font-style: italic;
+      font-weight: 400;
+      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+      line-height: 1.45;
+      color: var(--cream);
+      margin-bottom: 0.7rem;
+    }
+
+    .closing-line span {
+      display: block;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: closingLineIn 0.6s ease forwards;
+    }
+
+    .closing-line span:nth-child(1) { animation-delay: 0.1s; }
+    .closing-line span:nth-child(2) { animation-delay: 0.3s; }
+    .closing-line span:nth-child(3) { animation-delay: 0.5s; }
+    .closing-line span:nth-child(4) { animation-delay: 0.7s; }
+
+    @keyframes closingLineIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .closing-line .closing-emphasis {
+      color: var(--sand);
+    }
+
+    .closing-body {
+      font-size: 0.95rem;
+      line-height: 1.8;
+      color: rgba(245, 240, 232, 0.58);
+    }
+
+    .completion-marker {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.92rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--cream);
+      flex-shrink: 0;
+    }
+
+    .completion-check {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(232, 213, 176, 0.22);
+      color: var(--white);
+      font-size: 1rem;
+      font-weight: 700;
+    }
+
+    @media (max-width: 900px) {
+      .block-inner { width: min(100% - 2.5rem, 1040px); }
+      .tension-tiles,
+      .sparks-grid,
+      .reflection-actions {
+        grid-template-columns: 1fr;
+      }
+      .closing-row { flex-direction: column; align-items: flex-start; }
+    }
+
+    @media (max-width: 767px) {
+      .sidebar { display: none; }
+      .page-layout { margin-left: 0; }
+      .block-inner { width: min(100% - 2rem, 1040px); }
+      .section-header,
+      .obj-callout,
+      .pivot-block,
+      .quote-block,
+      .sparks-block,
+      .reflection-block,
+      .closing-block {
+        padding-top: 1.5rem;
+        padding-bottom: 1.5rem;
+      }
+      .section-header { padding-top: 2rem; padding-bottom: 2rem; }
+      .section-header-row { align-items: flex-start; gap: 0.9rem; }
+      .sh-number { font-size: 4.8rem; }
+      .sh-title { font-size: 1.9rem; }
+      .sh-label { font-size: 0.68rem; letter-spacing: 0.16em; }
+      .sh-time { padding-top: 0.4rem; }
+      .pivot-copy p,
+      .sparks-sub,
+      .spark-card p,
+      .reflection-prompt {
+        font-size: 0.98rem;
+        line-height: 1.8;
+      }
+      .spark-card { min-height: 0; }
+      .quote-text { line-height: 1.35; }
+      .closing-left { max-width: none; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar" aria-label="Course outline">
+    <div class="sidebar-logo">EDCI 487<br>Climate Change Education<br>Week 3</div>
+    <nav class="sidebar-nav">
+      <a class="nav-item" href="week3-intro.html">
+        <span class="nav-num">↑</span>
+        <span class="nav-label">Intro &amp; Overview</span>
+      </a>
+      <a class="nav-item" href="section1.html#section1">
+        <span class="nav-num">01</span>
+        <span class="nav-label">Why Your Neighborhood Matters</span>
+      </a>
+      <a class="nav-item" href="section2.html">
+        <span class="nav-num">02</span>
+        <span class="nav-label">Key Concepts</span>
+      </a>
+      <a class="nav-item" href="section3.html">
+        <span class="nav-num">03</span>
+        <span class="nav-label">What the Research Confirms</span>
+      </a>
+      <a class="nav-item" href="section4.html">
+        <span class="nav-num">04</span>
+        <span class="nav-label">Explore Your Community</span>
+      </a>
+      <a class="nav-item active" href="section5.html">
+        <span class="nav-num">05</span>
+        <span class="nav-label">Classroom Connection</span>
+      </a>
+    </nav>
+  </aside>
+
+  <main class="page-layout">
+    <section class="section-header">
+      <div class="block-inner section-header-row">
+        <div class="sh-number">05</div>
+        <div class="sh-center">
+          <div class="sh-label">Section 5 of 5</div>
+          <h1 class="sh-title">Classroom Connection</h1>
+        </div>
+        <div class="sh-time">5 min</div>
+      </div>
+    </section>
+
+    <section class="obj-callout">
+      <div class="block-inner">
+        <p>By the end of this section, you'll leave with one question you're genuinely not sure how to answer yet — and that's exactly the point.</p>
+      </div>
+    </section>
+
+    <section class="pivot-block">
+      <div class="block-inner">
+        <div class="pivot-copy">
+          <p>You've spent the last 40 minutes learning things many adults never encounter. Climate apartheid. Environmental colonialism. The 3-30-300 rule. The BC heat dome.</p>
+          <p>Now imagine handing all of that to a 13-year-old on a Tuesday morning.</p>
+          <div class="pivot-question">How do you do it without overwhelming them — or looking away from the truth?</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="quote-block">
+      <div class="block-inner">
+        <div class="quote-mark">“</div>
+        <div class="quote-text">Climate education isn't about scaring students. It's about helping them see clearly, think critically, and feel empowered to act.</div>
+        <div class="quote-attribution">A principle for climate justice teaching</div>
+        <p class="quote-prompt">Which part of that feels hardest to you right now — and why?</p>
+        <div class="tension-tiles" role="group" aria-label="Choose the tension that feels hardest right now">
+          <button class="tension-tile" type="button" data-choice="see">Helping them see clearly</button>
+          <button class="tension-tile" type="button" data-choice="empowered">Helping them feel empowered</button>
+        </div>
+        <div class="tile-response" id="tile-response" aria-live="polite"></div>
+      </div>
+    </section>
+
+    <section class="sparks-block">
+      <div class="block-inner">
+        <div class="section-kicker">Teaching Approaches</div>
+        <h2 class="sparks-heading">Four sparks. Not a lesson plan.</h2>
+        <p class="sparks-sub">These aren't prescriptions — they're starting points. One of them will probably already feel like yours.</p>
+        <div class="sparks-grid">
+          <article class="spark-card local">
+            <div class="spark-head">
+              <div class="spark-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 21s6-5.2 6-11a6 6 0 1 0-12 0c0 5.8 6 11 6 11Z"></path>
+                  <circle cx="12" cy="10" r="2.5"></circle>
+                </svg>
+              </div>
+              <div class="spark-title">Start local</div>
+            </div>
+            <p>The tool you used today could work with students too. Their own block is the most powerful text.</p>
+          </article>
+          <article class="spark-card story">
+            <div class="spark-head">
+              <div class="spark-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4.5 5.5A2.5 2.5 0 0 1 7 3h12.5v16H7a2.5 2.5 0 0 0-2.5 2.5Z"></path>
+                  <path d="M7 3v18"></path>
+                  <path d="M10 7h6"></path>
+                  <path d="M10 11h6"></path>
+                </svg>
+              </div>
+              <div class="spark-title">Lead with story</div>
+            </div>
+            <p>Leandro didn't start with data. Neither did you. A person before a concept is almost always right.</p>
+          </article>
+          <article class="spark-card why">
+            <div class="spark-head">
+              <div class="spark-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 4a6.5 6.5 0 0 0-6.5 6.5c0 2.1 1 3.8 2.5 5.1V19l3-1.6c.3.1.7.1 1 .1A6.5 6.5 0 1 0 12 4Z"></path>
+                  <path d="M10 10.5a2 2 0 1 1 3.2 1.6c-.7.5-1.2.9-1.2 1.9"></path>
+                  <path d="M12 17h.01"></path>
+                </svg>
+              </div>
+              <div class="spark-title">Make space for why</div>
+            </div>
+            <p>"Why is our street hotter?" is a climate justice question. Students will ask it if you let them.</p>
+          </article>
+          <article class="spark-card change">
+            <div class="spark-head">
+              <div class="spark-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 21V11"></path>
+                  <path d="M12 11c0-3 2.2-5.5 5-6 0 3-2.2 5.5-5 6Z"></path>
+                  <path d="M12 15c0-2.3-1.7-4.2-4-4.6 0 2.3 1.7 4.2 4 4.6Z"></path>
+                  <path d="M12 18c0-2.3 1.7-4.2 4-4.6 0 2.3-1.7 4.2-4 4.6Z"></path>
+                </svg>
+              </div>
+              <div class="spark-title">Show what changed</div>
+            </div>
+            <p>Injustice without agency crushes. Every hard truth needs at least one story of something that got better.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="reflection-block">
+      <div class="block-inner">
+        <div class="reflection-card">
+          <h2 class="reflection-heading">One thing before you go</h2>
+          <p class="reflection-prompt">Think about a grade level you're likely to teach. Pick one of the four sparks above — or your own.
+
+Describe one moment in a classroom: a question you'd ask, an activity you'd run, or something you'd show. Just one. Specific enough that you could actually do it.</p>
+          <div class="response-frame">
+            <div class="response-label">✦ Your response</div>
+            <label class="sr-only" for="reflection-textarea">Reflection response</label>
+            <textarea id="reflection-textarea" rows="5" placeholder="Grade level, one moment, what students would do..."></textarea>
+            <div class="reflection-actions">
+              <button class="submit-button" id="copy-button" type="button">Submit</button>
+              <p class="private-note">Erika will read this before class. She'll use your responses to shape the discussion.</p>
+              <div class="copy-message" id="copy-message" aria-live="polite"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="closing-block">
+      <div class="block-inner">
+        <div class="closing-row">
+          <div class="closing-left">
+            <div class="closing-line">
+              <span>You noticed.</span>
+              <span>You named it.</span>
+              <span>You measured it.</span>
+              <span class="closing-emphasis">You imagined teaching it.</span>
+            </div>
+            <div class="closing-body">Bring that energy to class.</div>
+          </div>
+          <div class="completion-marker">
+            <span class="completion-check">✓</span>
+            <span>Module complete</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const tileButtons = document.querySelectorAll(".tension-tile");
+    const tileResponse = document.getElementById("tile-response");
+    const acknowledgement = "That tension is worth bringing to class on Thursday.";
+
+    tileButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        tileResponse.textContent = acknowledgement;
+        tileResponse.classList.add("is-visible");
+      });
+    });
+
+    const copyButton = document.getElementById("copy-button");
+    const copyMessage = document.getElementById("copy-message");
+    const reflectionTextarea = document.getElementById("reflection-textarea");
+
+    copyButton.addEventListener("click", async () => {
+      const text = reflectionTextarea.value.trim();
+
+      if (!text) {
+        copyMessage.textContent = "Write your response first, then copy it.";
+        return;
+      }
+
+      try {
+        await navigator.clipboard.writeText(text);
+        copyMessage.textContent = "Paste this into the Brightspace submission box for Week 3.";
+      } catch (error) {
+        reflectionTextarea.focus();
+        reflectionTextarea.select();
+        copyMessage.textContent = "Clipboard access was blocked. Your response is selected so you can copy it manually.";
+      }
+    });
+  </script>
+</body>
+</html>
