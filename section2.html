@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Section 2: Key Concepts — EDCI 487 Week 3</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
 <style>
 /* ══════════════════════════════════════════
    DESIGN TOKENS
@@ -287,6 +287,11 @@ body::after {
   font-weight: 700; color: var(--forest);
   line-height: 1.3; position: relative; z-index: 1;
   margin-bottom: 1.5rem;
+  min-height: 2.8em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
 }
 .card-hint {
   position: relative;
@@ -403,14 +408,17 @@ body::after {
   min-width: 0;
 }
 .case-stat-num {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Cinzel', 'Playfair Display', serif;
   font-size: clamp(2.6rem, 5vw, 3.8rem);
-  font-weight: 700;
-  color: var(--clay);
-  line-height: 1;
+  font-weight: 800;
+  color: var(--sand);
+  line-height: 0.95;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  text-shadow: 0 0.05em 0 rgba(28, 26, 20, 0.28);
 }
 .case-stat-label {
-  font-size: 0.78rem; line-height: 1.5;
+  font-size: 0.92rem; line-height: 1.55;
   color: rgba(245,240,232,0.5);
   margin-top: 0.4rem;
   max-width: none;
