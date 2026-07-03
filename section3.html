@@ -4,13 +4,11 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Section 3: The Data — EDCI 487 Week 3</title>
-<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
 <style>
-/* ══════════════════════════════════════════
-   DESIGN TOKENS
-══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
-  --forest:    #1a2e1a;
+  --forest:    #2d5a3f;
   --near-black:#1c1a14;
   --moss:      #4a6741;
   --sage:      #7a9e6e;
@@ -20,881 +18,316 @@
   --sand:      #e8d5b0;
   --cream:     #f5f0e8;
   --white:     #fefcf8;
-  --text:      #1a2e1a;
-  --muted:     #7a6a5a;
 }
-
-/* ══════════════════════════════════════════
-   RESET + BASE
-══════════════════════════════════════════ */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; }
-body {
-  font-family: 'DM Sans', sans-serif;
-  font-weight: 300;
-  background: var(--moss);
-  color: var(--text);
-  overflow-x: hidden;
-}
-body::after {
-  content: '';
-  position: fixed; inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
-  pointer-events: none; z-index: 999;
-}
+body { font-family: 'DM Sans', sans-serif; font-weight: 300; background: var(--cream); color: var(--near-black); min-height: 100vh; overflow-x: hidden; }
+body::after { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.035; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 200px 200px; }
 
-/* ══════════════════════════════════════════
-   PROGRESS BAR
-══════════════════════════════════════════ */
-.progress-bar {
-  position: fixed; top: 0; left: 0; right: 0;
-  height: 3px; background: rgba(26,46,26,0.08); z-index: 200;
-}
-.progress-fill {
-  height: 100%; width: 0%;
-  background: linear-gradient(90deg, var(--clay), var(--ember));
-  transition: width 0.15s ease;
-}
+#progress-bar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--clay), var(--ember)); transform-origin: left; transform: scaleX(0); transition: transform 0.1s linear; z-index: 1000; }
 
-/* ══════════════════════════════════════════
-   SIDEBAR
-══════════════════════════════════════════ */
-.sidebar {
-  position: fixed; top: 0; left: 0;
-  width: 220px; height: 100vh;
-  background: #2f4a2f;
-  border-right: 1px solid rgba(122,158,110,0.2);
-  z-index: 100;
-  display: flex; flex-direction: column;
-  padding: 2rem 0; overflow-y: auto;
-}
-.sidebar-logo {
-  font-size: 0.68rem; letter-spacing: 0.22em;
-  text-transform: uppercase; color: rgba(122,158,110,0.5);
-  padding: 0 1.5rem 1.5rem;
-  border-bottom: 1px solid rgba(122,158,110,0.1);
-  margin-bottom: 1.5rem; line-height: 1.6;
-}
-.nav-item {
-  display: flex; align-items: flex-start; gap: 0.6rem;
-  padding: 0.7rem 1.5rem; text-decoration: none;
-  border-left: 3px solid transparent;
-  transition: all 0.2s; cursor: pointer;
-}
+.sidebar-toggle { position: fixed; top: 1.25rem; left: 1.25rem; z-index: 200; width: 40px; height: 40px; background: rgba(47,74,47,0.9); border: 1px solid rgba(122,158,110,0.25); border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 0; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: background 0.2s; }
+.sidebar-toggle:hover { background: rgba(47,74,47,1); }
+.sidebar-toggle .bar { display: block; width: 18px; height: 2px; background: var(--cream); border-radius: 1px; transition: transform 0.3s ease, opacity 0.3s ease; }
+.sidebar-toggle.open .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.sidebar-toggle.open .bar:nth-child(2) { opacity: 0; }
+.sidebar-toggle.open .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 140; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+.sidebar-overlay.visible { opacity: 1; pointer-events: auto; }
+
+.sidebar { position: fixed; top: 0; left: 0; width: 260px; height: 100vh; background: #2f4a2f; border-right: 1px solid rgba(122,158,110,0.2); z-index: 150; display: flex; flex-direction: column; align-items: stretch; padding: 4.5rem 0 2rem; overflow-y: auto; transform: translateX(-100%); transition: transform 0.3s ease; text-align: left; }
+.sidebar.open { transform: translateX(0); }
+.sidebar-logo { font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(122,158,110,0.5); padding: 0 1rem 1.5rem 2rem; border-bottom: 1px solid rgba(122,158,110,0.1); margin-bottom: 1.5rem; line-height: 1.6; }
+.sidebar-nav { display: flex; flex-direction: column; padding: 0; }
+.nav-item { display: flex; align-items: baseline; gap: 0.5rem; padding: 0.7rem 1rem 0.7rem 2rem; position: relative; text-decoration: none; transition: background 0.2s ease; width: 100%; }
 .nav-item:hover { background: rgba(245,240,232,0.04); }
-.nav-item.active {
-  border-left-color: var(--clay);
-}
-.nav-num {
-  font-size: 0.68rem; font-weight: 500;
-  color: rgba(245,240,232,0.25); flex-shrink: 0; margin-top: 2px;
-}
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--clay); }
+.nav-num { font-size: 0.68rem; font-weight: 500; color: rgba(245,240,232,0.25); width: 1.5rem; flex-shrink: 0; text-align: left; }
 .nav-item.active .nav-num { color: var(--clay); }
-.nav-label {
-  font-size: 0.75rem; font-weight: 300;
-  line-height: 1.4; color: rgba(245,240,232,0.35);
-}
+.nav-label { font-size: 0.75rem; font-weight: 300; line-height: 1.4; color: rgba(245,240,232,0.35); flex: 1; min-width: 0; text-align: left; }
 .nav-item.active .nav-label { color: var(--cream); font-weight: 500; }
+.nav-time { font-size: 0.6rem; color: rgba(245,240,232,0.22); letter-spacing: 0.06em; flex-shrink: 0; white-space: nowrap; }
 
-/* ══════════════════════════════════════════
-   MAIN
-══════════════════════════════════════════ */
-.main { margin-left: 220px; min-height: 100vh; }
+.block-inner { width: min(1080px, 100%); margin: 0 auto; }
 
-.block-inner {
-  width: min(1080px, 100%);
-  margin: 0 auto;
-}
-
-/* ══════════════════════════════════════════
-   SECTION HEADER
-══════════════════════════════════════════ */
-.section-header {
-  background: var(--forest);
-  padding: 2.5rem 3rem;
-}
-.section-header-row {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  text-align: left;
-}
-.sh-number {
-  font-family: 'Playfair Display', serif;
-  font-size: 7rem; font-weight: 900;
-  color: rgba(255,255,255,0.2);
-  line-height: 1; flex-shrink: 0; user-select: none;
-}
+.section-header { background: var(--forest); padding: 2.5rem 3rem; }
+.section-header-row { display: flex; align-items: center; gap: 1.5rem; }
+.sh-number { font-family: 'Playfair Display', serif; font-size: 10rem; font-weight: 900; color: rgba(255,255,255,0.2); line-height: 1; flex-shrink: 0; user-select: none; }
 .sh-center { flex: 1; }
-.sh-label {
-  font-size: 0.82rem; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--clay); margin-bottom: 0.35rem;
-}
-.sh-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 2.2rem; font-weight: 700;
-  color: var(--cream); line-height: 1.25;
-}
-.sh-time {
-  font-size: 0.78rem; letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: rgba(245,240,232,0.28);
-  flex-shrink: 0; align-self: center;
-}
+.sh-label { font-size: 1rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--clay); margin-bottom: 0.35rem; }
+.sh-title { font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 700; color: var(--cream); line-height: 1.25; }
+.sh-time { font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,240,232,0.28); flex-shrink: 0; align-self: center; }
 
-/* ══════════════════════════════════════════
-   OBJECTIVE CALLOUT
-══════════════════════════════════════════ */
-.obj-callout {
-  background: var(--sage-pale);
-  border-left: 3px solid var(--sage);
-  padding: 1.25rem 3rem;
-}
-.obj-callout p {
-  font-family: 'Playfair Display', serif;
-  font-style: italic; font-size: 1rem;
-  color: #2d5a27; line-height: 1.65;
-}
+.content-block { background: var(--white); padding: 3.5rem 3rem 2.5rem; }
+.content-block.alt { background: var(--cream); }
+.content-block p { font-size: 1rem; line-height: 1.9; color: rgba(26,46,26,0.75); margin-bottom: 0.5rem; }
+.content-block p:last-child { margin-bottom: 0; }
+.content-block strong { font-weight: 500; color: var(--near-black); }
+.content-block h2 { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 2.5vw, 1.9rem); font-weight: 700; color: var(--forest); margin-bottom: 1.25rem; line-height: 1.15; }
+.source-credit { font-size: 0.9rem; font-style: italic; color: rgba(26,46,26,0.32); margin-top: 1rem; }
 
-/* ══════════════════════════════════════════
-   BLOCK 3: REFRAME OPENING
-══════════════════════════════════════════ */
-.opening-block {
-  background: var(--cream);
-  padding: 3.5rem 3rem 2.5rem;
-}
-.opening-block h2 {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(1.5rem, 2.5vw, 1.9rem);
-  font-weight: 700; color: var(--forest);
-  margin-bottom: 1.25rem; line-height: 1.15;
-}
-.opening-block p {
-  font-size: 0.95rem; line-height: 1.9;
-  color: rgba(26,46,26,0.75);
-  margin-bottom: 0.5rem;
-}
-.source-credit {
-  font-size: 0.9rem; font-style: italic;
-  color: rgba(26,46,26,0.32); margin-top: 1rem;
-}
+.sage-callout { background: var(--sage-pale); border-left: 4px solid var(--moss); padding: 1.25rem 3rem; }
+.sage-callout .callout-quote { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.05rem; line-height: 1.85; color: rgba(26,46,26,0.7); }
 
-/* ══════════════════════════════════════════
-   BLOCK 4: FINDINGS — EDITORIAL STAT CARDS
-══════════════════════════════════════════ */
-.findings-section {
-  background: var(--forest);
-  padding: 4rem 3rem 4.5rem;
-  position: relative; overflow: hidden;
-}
-.findings-section::before {
-  content: '';
-  position: absolute; top: -100px; right: -100px;
-  width: 500px; height: 500px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(196,98,45,0.05), transparent 65%);
-  pointer-events: none;
-}
-.findings-eyebrow {
-  font-size: 0.82rem; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--clay);
-  margin-bottom: 2rem;
-  text-align: left;
-}
-.findings-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.5rem;
-  position: relative; z-index: 1;
-}
-.finding-card {
-  background: rgba(255,255,255,0.04);
-  border: 1px solid rgba(122,158,110,0.12);
-  border-top: 3px solid var(--clay);
-  min-height: 220px;
-  padding: 2.5rem 2rem;
-  border-radius: 12px;
-}
-.finding-headline {
-  font-family: 'Playfair Display', serif;
-  font-style: italic; font-size: 1.1rem;
-  font-weight: 700; color: var(--ember);
-  line-height: 1.2; margin-bottom: 1.25rem;
-}
-.finding-body {
-  font-size: 0.88rem; line-height: 1.8;
-  color: rgba(245,240,232,0.65);
-}
-.finding-body strong {
-  color: var(--cream); font-weight: 500;
-}
-
-/* ══════════════════════════════════════════
-   BLOCK 5: PREDICTION INTERACTION
-══════════════════════════════════════════ */
-.prediction-block {
-  background: var(--cream);
-  border-top: 3px solid rgba(196,98,45,0.15);
-  padding: 5rem 3rem 4.5rem;
-}
-.prediction-inner {
-  width: 100%;
-}
-.predict-label {
-  font-family: 'Playfair Display', serif;
-  font-style: italic; font-size: 1rem;
-  color: #c4622d; margin-bottom: 1.75rem;
-  display: flex; align-items: center; gap: 0.75rem;
-}
-.predict-label::after {
-  content: '';
-  display: block; flex: 1;
-  height: 1px; background: rgba(196,98,45,0.2);
-}
-
-.predict-q {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.02rem;
-  font-weight: 700; color: var(--forest);
-  line-height: 1.5; margin-bottom: 1.5rem;
-}
-
-.predict-options {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem; margin-bottom: 0;
-}
-.predict-option {
-  background: var(--white);
-  border: 1px solid rgba(26,46,26,0.1);
-  border-radius: 12px;
-  min-height: 52px;
-  padding: 1rem 1.4rem;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.92rem; font-weight: 300;
-  color: var(--forest); cursor: pointer;
-  transition: all 0.2s; text-align: left;
-  display: flex; align-items: center; gap: 0.6rem;
-}
-.predict-option:hover {
-  border-color: rgba(196,98,45,0.4);
-  background: rgba(196,98,45,0.04);
-}
-.predict-option.selected {
-  border-color: var(--clay);
-  background: rgba(196,98,45,0.08);
-  font-weight: 500;
-}
-.predict-option.selected::before {
-  content: '✓';
-  color: var(--clay); font-size: 0.75rem;
-  flex-shrink: 0;
-}
-
-/* hidden reveal states */
-.predict-q2-wrap,
-.predict-ack {
-  opacity: 0; transform: translateY(14px);
-  pointer-events: none;
-  transition: opacity 0.45s ease, transform 0.45s ease;
-  margin-top: 2.5rem;
-}
-.predict-q2-wrap.revealed,
-.predict-ack.revealed {
-  opacity: 1; transform: translateY(0);
-  pointer-events: all;
-}
-
-.predict-divider {
-  height: 1px; background: rgba(26,46,26,0.08);
-  margin-bottom: 2.5rem;
-}
-
-.predict-ack-text {
-  font-family: 'Playfair Display', serif;
-  font-style: italic; font-size: 1.3rem;
-  color: var(--sage); margin-bottom: 2rem;
-  line-height: 1.5;
-}
-.predict-cta {
-  display: inline-flex; align-items: center; gap: 0.6rem;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 1rem; font-weight: 500;
-  letter-spacing: 0.08em; text-transform: uppercase;
-  color: var(--clay); cursor: pointer;
-  text-decoration: none;
-  transition: color 0.2s, gap 0.2s;
-  background: none; border: none; padding: 0;
-}
-.predict-cta:hover { color: var(--ember); gap: 0.9rem; }
-.cta-arrow {
-  width: 20px; height: 1px; background: currentColor;
-  position: relative; transition: width 0.2s;
-}
-.predict-cta:hover .cta-arrow { width: 28px; }
-.cta-arrow::after {
-  content: ''; position: absolute; right: 0; top: -3px;
-  width: 6px; height: 6px;
-  border-right: 1px solid currentColor;
-  border-top: 1px solid currentColor;
-  transform: rotate(45deg);
-}
-
-/* ══════════════════════════════════════════
-   BLOCK 6: 3-30-300 RULE
-══════════════════════════════════════════ */
-.benchmark-section {
-  background: var(--cream);
-  padding: 1rem 3rem 4.5rem;
-  scroll-margin-top: 2rem;
-}
-.benchmark-eyebrow {
-  font-size: 0.82rem; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--clay);
-  margin-bottom: 0.5rem;
-}
-.benchmark-heading {
-  font-family: 'Playfair Display', serif;
-  font-size: clamp(1.5rem, 2.5vw, 2.1rem);
-  font-weight: 700; color: var(--forest);
-  margin-bottom: 1rem; line-height: 1.15;
-}
-.benchmark-intro {
-  font-size: 0.9rem; line-height: 1.85;
-  color: rgba(26,46,26,0.72);
-  max-width: 100%; margin-bottom: 2.5rem;
-}
-
-/* benchmark flip cards */
-.benchmark-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1.25rem;
-}
-.bm-flip {
-  perspective: 1200px;
-  height: 300px; cursor: pointer;
-}
-.bm-inner {
-  position: relative; width: 100%; height: 100%;
-  transition: transform 0.6s cubic-bezier(0.4,0,0.2,1);
-  transform-style: preserve-3d;
-}
-.bm-flip.flipped .bm-inner { transform: rotateY(180deg); }
-
-.bm-front, .bm-back {
-  position: absolute; inset: 0;
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-  border-radius: 12px; overflow: hidden;
-}
-
-/* front — dark forest with ember number */
-.bm-front {
-  background: var(--forest);
-  border: 1px solid rgba(122,158,110,0.15);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center;
-  text-align: center; padding: 2rem 1.5rem;
-  position: relative;
-  transition: border-color 0.2s;
-}
-.bm-flip:hover .bm-front {
-  border-color: rgba(122,158,110,0.4);
-}
-.bm-number {
-  font-family: 'Cinzel', 'Playfair Display', serif;
-  font-size: clamp(2.6rem, 5vw, 3.8rem);
-  font-weight: 800;
-  color: var(--sand); line-height: 0.95;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  text-shadow: 0 0.05em 0 rgba(28, 26, 20, 0.28);
-  margin-bottom: 0.4rem;
-}
-.bm-unit {
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.9rem;
-  font-weight: 500;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(245,240,232,0.38);
-}
-.bm-hint {
-  position: absolute; bottom: 1rem;
-  font-size: 0.58rem; letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: rgba(255,255,255,0.45);
-}
-
-/* back — cream with dark text */
-.bm-back {
-  background: var(--white);
-  transform: rotateY(180deg);
-  padding: 1.6rem 1.4rem 1.2rem;
-  border: 1px solid rgba(26,46,26,0.08);
-  display: flex; flex-direction: column;
-  overflow-y: auto;
-}
-.bm-tag {
-  font-size: 0.56rem; letter-spacing: 0.24em;
-  text-transform: uppercase; color: var(--clay);
-  margin-bottom: 0.3rem; font-weight: 500;
-}
-.bm-def {
-  font-size: 0.98rem; line-height: 1.75;
-  color: var(--forest); margin-bottom: 0.9rem;
-}
-.bm-rationale {
-  font-size: 0.92rem; line-height: 1.7;
-  color: rgba(26,46,26,0.65);
-  padding-top: 0.6rem;
-  border-top: 1px solid var(--sand);
-}
-
-/* ══════════════════════════════════════════
-   BLOCK 7: KNOWLEDGE CHECK — SCENARIO
-══════════════════════════════════════════ */
-.check-section {
-  background: var(--sand);
-  padding: 4rem 3rem;
-  position: relative; overflow: hidden;
-}
-.check-section::before {
-  content: '';
-  position: absolute; bottom: -80px; left: -80px;
-  width: 400px; height: 400px; border-radius: 50%;
-  background: radial-gradient(circle, rgba(196,98,45,0.08), transparent 65%);
-  pointer-events: none;
-}
-.check-inner { width: 100%; position: relative; z-index: 1; }
-
-.check-eyebrow {
-  font-size: 0.82rem; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--clay);
-  margin-bottom: 0.4rem;
-}
-.check-title {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.15rem; font-weight: 700;
-  color: var(--forest); margin-bottom: 0.3rem;
-}
-.check-sub {
-  font-size: 1rem; font-style: italic;
-  color: rgba(42,31,20,0.45); margin-bottom: 2rem;
-}
-
-/* scenario card */
-.scenario-card {
-  background: var(--white);
-  border-left: 3px solid var(--clay);
-  padding: 1.5rem 1.75rem;
-  margin-bottom: 1.75rem;
-  border-radius: 12px;
-  box-shadow: 0 12px 28px rgba(42,31,20,0.06);
-}
-.scenario-eyebrow {
-  font-size: 0.85rem; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--clay);
-  margin-bottom: 0.6rem;
-}
-.scenario-text {
-  font-size: 0.92rem; line-height: 1.9;
-  color: rgba(42,31,20,0.82);
-  margin-bottom: 1.25rem;
-}
-.scenario-tags {
-  display: flex; flex-wrap: wrap; gap: 0.5rem;
-}
-.s-tag {
-  background: rgba(196,98,45,0.15);
-  border: 1px solid rgba(196,98,45,0.3);
-  padding: 0.22rem 0.75rem;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.9rem; font-weight: 500;
-  color: var(--ember); display: inline-block;
-}
-
-/* question */
-.q-num {
-  font-size: 1rem; letter-spacing: 0.08em;
-  text-transform: uppercase; color: var(--clay);
-  display: block; margin-bottom: 0.5rem;
-}
-.q-text {
-  font-family: 'Playfair Display', serif;
-  font-size: 1.02rem; font-weight: 700;
-  color: var(--forest); line-height: 1.4;
-  margin-bottom: 1.25rem;
-}
-
-/* options */
-.options { display: flex; flex-direction: column; gap: 0.6rem; }
-.option {
-  display: flex; align-items: flex-start; gap: 1rem;
-  background: var(--white);
-  border: 1px solid rgba(26,46,26,0.12);
-  border-radius: 12px;
-  padding: 1rem 1.25rem; cursor: pointer;
-  transition: background 0.2s, border-color 0.2s;
-  user-select: none;
-}
-.option:hover:not(.locked) {
-  background: rgba(122,158,110,0.08);
-  border-color: rgba(122,158,110,0.4);
-}
-.option.selected:not(.locked) {
-  background: rgba(196,98,45,0.15);
-  border-color: var(--clay);
-}
-.option.correct {
-  background: rgba(74,119,74,0.25);
-  border-color: #4a774a; cursor: default;
-}
-.option.incorrect {
-  background: rgba(196,98,45,0.18);
-  border-color: var(--clay); cursor: default;
-}
-.option.revealed {
-  background: rgba(74,119,74,0.12);
-  border-color: rgba(74,119,74,0.35); cursor: default;
-}
-.option.locked { cursor: default; }
-
-.opt-radio {
-  width: 18px; height: 18px; border-radius: 50%;
-  border: 2px solid rgba(122,158,110,0.4);
-  flex-shrink: 0; margin-top: 1px;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s;
-}
-.option.selected:not(.locked) .opt-radio { border-color: var(--clay); background: var(--clay); }
-.option.correct .opt-radio { border-color: #4a774a; background: #4a774a; }
-.option.incorrect .opt-radio { border-color: var(--clay); background: var(--clay); }
-.opt-dot {
-  width: 6px; height: 6px; border-radius: 50%;
-  background: white; opacity: 0; transition: opacity 0.15s;
-}
-.option.selected .opt-dot,
-.option.correct .opt-dot,
-.option.incorrect .opt-dot { opacity: 1; }
-
-.opt-icon {
-  font-size: 0.8rem; margin-left: auto; flex-shrink: 0;
-  opacity: 0; transition: opacity 0.2s; align-self: center;
-}
-.option.correct .opt-icon,
-.option.incorrect .opt-icon { opacity: 1; }
-
-.opt-text {
-  font-size: 0.88rem; line-height: 1.65;
-  color: rgba(42,31,20,0.8);
-}
-.option.correct .opt-text { color: #2f5d2f; }
-.option.incorrect .opt-text { color: #8a4320; }
-
-/* confirm button */
-.confirm-btn {
-  display: none; width: 100%; margin-top: 1rem;
-  background: var(--clay); color: white; border: none;
-  border-radius: 12px;
-  padding: 0.9rem 1.5rem;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.82rem; font-weight: 500;
-  letter-spacing: 0.1em; text-transform: uppercase;
-  cursor: pointer; transition: background 0.2s;
-}
-.confirm-btn:hover { background: var(--ember); }
-.confirm-btn.visible { display: block; }
-
-/* feedback */
-.feedback-panel {
-  margin-top: 1rem; padding: 1.1rem 1.4rem;
-  display: none; opacity: 0;
-  align-items: flex-start; gap: 0.75rem;
-  border-radius: 12px;
-}
-.feedback-panel.visible {
-  display: flex;
-  animation: feedIn 0.4s ease forwards;
-}
-@keyframes feedIn {
-  from{opacity:0;transform:translateY(8px)}
-  to{opacity:1;transform:translateY(0)}
-}
-.feedback-panel.correct-fb {
-  background: rgba(74,119,74,0.2);
-  border: 1px solid rgba(74,119,74,0.4);
-}
-.feedback-panel.incorrect-fb {
-  background: rgba(232,135,74,0.15);
-  border: 1px solid rgba(232,135,74,0.35);
-}
-.fb-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
-.fb-text {
-  font-size: 0.88rem; line-height: 1.65;
-  color: rgba(245,240,232,0.85);
-}
-.fb-text strong { color: var(--cream); }
-
-/* ══════════════════════════════════════════
-   BLOCK 8: BRIDGE TO SECTION 4
-══════════════════════════════════════════ */
-.bridge-section {
-  background: var(--moss);
-  padding: 5rem 3.5rem;
-  border-top: 1px solid rgba(122,158,110,0.12);
-  position: relative;
-  overflow: hidden;
-}
-.bridge-section::after {
-  content: '';
-  position: absolute;
-  right: -100px;
-  top: -100px;
-  width: 400px;
-  height: 400px;
-  border-radius: 50%;
-  background: rgba(26,46,26,0.3);
-  pointer-events: none;
-}
-.bridge-section .block-inner {
-  width: 100%;
-  max-width: none;
-}
-.bridge-left { max-width: 620px; text-align: left; }
-.bridge-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 3rem;
-  position: relative;
-  z-index: 1;
-  width: 100%;
-}
-.bridge-heading {
-  font-family: 'Playfair Display', serif;
-  font-style: italic; font-weight: 400;
-  font-size: clamp(1.1rem, 2.5vw, 1.5rem);
-  color: var(--cream); line-height: 1.45;
-  margin-bottom: 1rem;
-}
-.bridge-heading em {
-  color: var(--ember); font-style: italic;
-}
-.bridge-body {
-  font-size: 0.95rem; line-height: 1.8;
-  color: rgba(245,240,232,0.55);
-}
-.continue-btn {
-  display: inline-flex; align-items: center; gap: 0.75rem;
-  background: var(--clay); color: white; border: none; border-radius: 12px;
-  padding: 1rem 2rem;
-  font-family: 'DM Sans', sans-serif;
-  font-size: 0.78rem; font-weight: 500;
-  letter-spacing: 0.12em; text-transform: uppercase;
-  cursor: pointer; transition: all 0.25s; flex-shrink: 0;
-  text-decoration: none;
-}
-.continue-btn:hover { background: var(--ember); transform: translateX(4px); }
-.btn-arrow {
-  width: 18px; height: 1px; background: currentColor;
-  position: relative; transition: width 0.2s; flex-shrink: 0;
-}
-.continue-btn:hover .btn-arrow { width: 26px; }
-.btn-arrow::after {
-  content: ''; position: absolute; right: 0; top: -3px;
-  width: 6px; height: 6px;
-  border-right: 1px solid currentColor;
-  border-top: 1px solid currentColor;
-  transform: rotate(45deg);
-}
-
-/* ══════════════════════════════════════════
-   SCROLL ANIMATIONS
-══════════════════════════════════════════ */
-.reveal {
-  opacity: 0; transform: translateY(18px);
-  transition: opacity 0.65s ease, transform 0.65s ease;
-}
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.55s ease, transform 0.55s ease; }
 .reveal.visible { opacity: 1; transform: translateY(0); }
-
-.reveal-stagger > * {
-  opacity: 0; transform: translateY(16px);
-  transition: opacity 0.5s ease, transform 0.5s ease;
-}
+.reveal-stagger > * { opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
 .reveal-stagger.visible > *:nth-child(1){transition-delay:0.05s}
 .reveal-stagger.visible > *:nth-child(2){transition-delay:0.18s}
 .reveal-stagger.visible > *:nth-child(3){transition-delay:0.31s}
 .reveal-stagger.visible > * { opacity: 1; transform: translateY(0); }
 
-/* ══════════════════════════════════════════
-   RESPONSIVE
-══════════════════════════════════════════ */
+/* FINDINGS */
+.findings-section { background: var(--forest); padding: 4rem 3rem 4.5rem; position: relative; overflow: hidden; }
+.findings-section::before { content: ''; position: absolute; top: -100px; right: -100px; width: 500px; height: 500px; border-radius: 50%; background: radial-gradient(circle, rgba(196,98,45,0.05), transparent 65%); pointer-events: none; }
+.findings-eyebrow { font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--clay); margin-bottom: 2rem; }
+.findings-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; position: relative; z-index: 1; }
+.finding-card { background: rgba(245,240,232,0.08); border: 1px solid rgba(122,158,110,0.18); border-top: 3px solid var(--clay); min-height: 220px; padding: 2.5rem 2rem; border-radius: 12px; backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.finding-headline { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.1rem; font-weight: 700; color: var(--ember); line-height: 1.2; margin-bottom: 1.25rem; }
+.finding-body { font-size: 0.88rem; line-height: 1.8; color: rgba(245,240,232,0.65); }
+.finding-body strong { color: var(--cream); font-weight: 500; }
+
+/* PREDICTION */
+.prediction-block { background: var(--cream); border-top: 3px solid rgba(196,98,45,0.15); padding: 5rem 3rem 4.5rem; }
+.predict-label { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1rem; color: var(--clay); margin-bottom: 1.75rem; display: flex; align-items: center; gap: 0.75rem; }
+.predict-label::after { content: ''; display: block; flex: 1; height: 1px; background: rgba(196,98,45,0.2); }
+.predict-q { font-family: 'Playfair Display', serif; font-size: 1.02rem; font-weight: 700; color: var(--forest); line-height: 1.5; margin-bottom: 1.5rem; }
+.predict-options { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+.predict-option { background: var(--white); border: 1px solid rgba(26,46,26,0.1); border-radius: 12px; min-height: 52px; padding: 1rem 1.4rem; font-family: 'DM Sans', sans-serif; font-size: 0.92rem; font-weight: 300; color: var(--forest); cursor: pointer; transition: all 0.2s; text-align: left; display: flex; align-items: center; gap: 0.6rem; }
+.predict-option:hover { border-color: rgba(196,98,45,0.4); background: rgba(196,98,45,0.04); }
+.predict-option.selected { border-color: var(--clay); background: rgba(196,98,45,0.08); font-weight: 500; }
+.predict-option.selected::before { content: '\2713'; color: var(--clay); font-size: 0.75rem; flex-shrink: 0; }
+.predict-q2-wrap, .predict-ack { opacity: 0; transform: translateY(14px); pointer-events: none; transition: opacity 0.45s ease, transform 0.45s ease; margin-top: 2.5rem; }
+.predict-q2-wrap.revealed, .predict-ack.revealed { opacity: 1; transform: translateY(0); pointer-events: all; }
+.predict-divider { height: 1px; background: rgba(26,46,26,0.08); margin-bottom: 2.5rem; }
+.predict-ack-text { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.3rem; color: var(--sage); margin-bottom: 2rem; line-height: 1.5; }
+.predict-cta { display: inline-flex; align-items: center; gap: 0.6rem; font-family: 'DM Sans', sans-serif; font-size: 1rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: var(--clay); cursor: pointer; text-decoration: none; transition: color 0.2s, gap 0.2s; background: none; border: none; padding: 0; }
+.predict-cta:hover { color: var(--ember); gap: 0.9rem; }
+.cta-arrow { width: 20px; height: 1px; background: currentColor; position: relative; transition: width 0.2s; }
+.predict-cta:hover .cta-arrow { width: 28px; }
+.cta-arrow::after { content: ''; position: absolute; right: 0; top: -3px; width: 6px; height: 6px; border-right: 1px solid currentColor; border-top: 1px solid currentColor; transform: rotate(45deg); }
+
+/* BENCHMARK */
+.benchmark-section { background: var(--cream); padding: 1rem 3rem 4.5rem; scroll-margin-top: 2rem; }
+.benchmark-eyebrow { font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--clay); margin-bottom: 0.5rem; }
+.benchmark-heading { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 2.5vw, 2.1rem); font-weight: 700; color: var(--forest); margin-bottom: 1rem; line-height: 1.15; }
+.benchmark-intro { font-size: 0.9rem; line-height: 1.85; color: rgba(26,46,26,0.72); margin-bottom: 2.5rem; }
+.benchmark-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; }
+.bm-flip { perspective: 1200px; height: 300px; cursor: pointer; }
+.bm-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4,0,0.2,1); transform-style: preserve-3d; }
+.bm-flip.flipped .bm-inner { transform: rotateY(180deg); }
+.bm-front, .bm-back { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 12px; overflow: hidden; }
+.bm-front { background: var(--forest); border: 1px solid rgba(122,158,110,0.15); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem 1.5rem; position: relative; transition: border-color 0.2s; }
+.bm-flip:hover .bm-front { border-color: rgba(122,158,110,0.4); }
+.bm-number { font-family: 'Playfair Display', serif; font-size: clamp(2.6rem, 5vw, 3.8rem); font-weight: 900; color: var(--sand); line-height: 0.95; letter-spacing: 0.04em; margin-bottom: 0.4rem; }
+.bm-unit { font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(245,240,232,0.38); }
+.bm-hint { position: absolute; bottom: 1rem; font-size: 0.58rem; letter-spacing: 0.2em; text-transform: uppercase; color: rgba(255,255,255,0.45); }
+.bm-back { background: var(--white); transform: rotateY(180deg); padding: 1.6rem 1.4rem 1.2rem; border: 1px solid rgba(26,46,26,0.08); display: flex; flex-direction: column; overflow-y: auto; }
+.bm-tag { font-size: 0.56rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--clay); margin-bottom: 0.3rem; font-weight: 500; }
+.bm-def { font-size: 0.98rem; line-height: 1.75; color: var(--forest); margin-bottom: 0.9rem; }
+.bm-rationale { font-size: 0.92rem; line-height: 1.7; color: rgba(26,46,26,0.65); padding-top: 0.6rem; border-top: 1px solid var(--sand); }
+
+/* KNOWLEDGE CHECK */
+.check-section { background: var(--sand); padding: 4rem 3rem; position: relative; overflow: hidden; }
+.check-section::before { content: ''; position: absolute; bottom: -80px; left: -80px; width: 400px; height: 400px; border-radius: 50%; background: radial-gradient(circle, rgba(196,98,45,0.08), transparent 65%); pointer-events: none; }
+.check-eyebrow { font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--clay); margin-bottom: 0.4rem; }
+.check-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; font-weight: 700; color: var(--forest); margin-bottom: 0.3rem; }
+.check-sub { font-size: 1rem; font-style: italic; color: rgba(42,31,20,0.45); margin-bottom: 2rem; }
+.scenario-card { background: var(--white); border-left: 3px solid var(--clay); padding: 1.5rem 1.75rem; margin-bottom: 1.75rem; border-radius: 12px; box-shadow: 0 12px 28px rgba(42,31,20,0.06); }
+.scenario-eyebrow { font-size: 0.85rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--clay); margin-bottom: 0.6rem; }
+.scenario-text { font-size: 0.92rem; line-height: 1.9; color: rgba(42,31,20,0.82); margin-bottom: 1.25rem; }
+.scenario-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.s-tag { background: rgba(196,98,45,0.15); border: 1px solid rgba(196,98,45,0.3); padding: 0.22rem 0.75rem; font-size: 0.9rem; font-weight: 500; color: var(--ember); }
+.q-num { font-size: 1rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--clay); display: block; margin-bottom: 0.5rem; }
+.q-text { font-family: 'Playfair Display', serif; font-size: 1.02rem; font-weight: 700; color: var(--forest); line-height: 1.4; margin-bottom: 1.25rem; }
+.options { display: flex; flex-direction: column; gap: 0.6rem; }
+.option { display: flex; align-items: flex-start; gap: 1rem; background: var(--white); border: 1px solid rgba(26,46,26,0.12); border-radius: 12px; padding: 1rem 1.25rem; cursor: pointer; transition: background 0.2s, border-color 0.2s; user-select: none; }
+.option:hover:not(.locked) { background: rgba(122,158,110,0.08); border-color: rgba(122,158,110,0.4); }
+.option.selected:not(.locked) { background: rgba(196,98,45,0.15); border-color: var(--clay); }
+.option.correct { background: rgba(74,119,74,0.25); border-color: #4a774a; cursor: default; }
+.option.incorrect { background: rgba(196,98,45,0.18); border-color: var(--clay); cursor: default; }
+.option.revealed { background: rgba(74,119,74,0.12); border-color: rgba(74,119,74,0.35); cursor: default; }
+.option.locked { cursor: default; }
+.opt-radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid rgba(122,158,110,0.4); flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center; transition: all 0.2s; }
+.option.selected:not(.locked) .opt-radio { border-color: var(--clay); background: var(--clay); }
+.option.correct .opt-radio { border-color: #4a774a; background: #4a774a; }
+.option.incorrect .opt-radio { border-color: var(--clay); background: var(--clay); }
+.opt-dot { width: 6px; height: 6px; border-radius: 50%; background: white; opacity: 0; transition: opacity 0.15s; }
+.option.selected .opt-dot, .option.correct .opt-dot, .option.incorrect .opt-dot { opacity: 1; }
+.opt-icon { font-size: 0.8rem; margin-left: auto; flex-shrink: 0; opacity: 0; transition: opacity 0.2s; align-self: center; }
+.option.correct .opt-icon, .option.incorrect .opt-icon { opacity: 1; }
+.opt-text { font-size: 0.88rem; line-height: 1.65; color: rgba(42,31,20,0.8); }
+.option.correct .opt-text { color: #2f5d2f; }
+.option.incorrect .opt-text { color: #8a4320; }
+.confirm-btn { display: none; width: 100%; margin-top: 1rem; background: var(--clay); color: white; border: none; border-radius: 4px; padding: 0.9rem 1.5rem; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; cursor: pointer; transition: background 0.2s; }
+.confirm-btn:hover { background: var(--ember); }
+.confirm-btn.visible { display: block; }
+.feedback-panel { margin-top: 1rem; padding: 1.1rem 1.4rem; display: none; opacity: 0; align-items: flex-start; gap: 0.75rem; border-radius: 12px; }
+.feedback-panel.visible { display: flex; animation: feedIn 0.4s ease forwards; }
+@keyframes feedIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.feedback-panel.correct-fb { background: rgba(74,119,74,0.2); border: 1px solid rgba(74,119,74,0.4); }
+.feedback-panel.incorrect-fb { background: rgba(232,135,74,0.15); border: 1px solid rgba(232,135,74,0.35); }
+.fb-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+.fb-text { font-size: 0.88rem; line-height: 1.65; color: rgba(26,46,26,0.85); }
+.fb-text strong { color: var(--near-black); }
+
+/* BEGIN CTA */
+.begin-section { background: var(--cream); padding: 4rem 3rem; display: flex; justify-content: space-between; align-items: center; gap: 4rem; }
+.begin-text .begin-heading { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--forest); font-weight: 700; margin-bottom: 0.6rem; }
+.begin-text .begin-sub { font-size: 1rem; line-height: 1.75; color: rgba(26,46,26,0.6); max-width: 480px; }
+.begin-action { display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem; flex-shrink: 0; }
+.btn-begin { display: inline-flex; align-items: center; gap: 1rem; background: var(--clay); color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; padding: 1rem 2rem; border-radius: 4px; transition: background 0.2s; }
+.btn-begin:hover { background: var(--ember); }
+.btn-begin .arrow { width: 20px; height: 1px; background: currentColor; position: relative; transition: width 0.25s; }
+.btn-begin:hover .arrow { width: 28px; }
+.btn-begin .arrow::after { content: ''; position: absolute; right: 0; top: -3px; width: 7px; height: 7px; border-right: 1px solid currentColor; border-top: 1px solid currentColor; transform: rotate(45deg); }
+.time-note { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(26,46,26,0.35); }
+
 @media (max-width: 900px) {
   .findings-grid { grid-template-columns: 1fr; gap: 1rem; }
   .benchmark-grid { grid-template-columns: 1fr; }
   .bm-flip { height: 260px; }
-  .bridge-row { flex-direction: column; align-items: flex-start; }
 }
 @media (max-width: 768px) {
-  .sidebar { display: none; }
-  .main { margin-left: 0; }
-  .section-header, .obj-callout, .opening-block,
-  .findings-section, .prediction-block,
-  .benchmark-section, .check-section,
-  .bridge-section { padding-left: 1.5rem; padding-right: 1.5rem; }
+  .section-header, .content-block, .sage-callout, .findings-section,
+  .prediction-block, .benchmark-section, .check-section, .begin-section { padding-left: 1.5rem; padding-right: 1.5rem; }
+  .sh-number { font-size: 5rem; }
   .predict-options { grid-template-columns: 1fr; }
-  .findings-grid { grid-template-columns: 1fr; }
-  .benchmark-grid { grid-template-columns: 1fr; }
+  .begin-section { flex-direction: column; align-items: flex-start; }
+  .begin-action { align-items: flex-start; }
 }
 </style>
 </head>
 <body>
+<div id="progress-bar"></div>
 
-<div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+<button class="sidebar-toggle" aria-label="Toggle navigation">
+  <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+</button>
+<div class="sidebar-overlay"></div>
 
-<!-- SIDEBAR -->
 <aside class="sidebar">
   <div class="sidebar-logo">EDCI 487<br>Climate Change Education<br>Week 3</div>
-  <a class="nav-item" href="week3-intro.html">
-    <span class="nav-num">↑</span>
-    <span class="nav-label">Intro &amp; Overview</span>
-  </a>
-  <a class="nav-item" href="section1.html">
-    <span class="nav-num">01</span>
-    <span class="nav-label">Why Your Neighborhood Matters</span>
-  </a>
-  <a class="nav-item" href="section2.html">
-    <span class="nav-num">02</span>
-    <span class="nav-label">The Language of Climate Justice</span>
-  </a>
-  <a class="nav-item active" href="section3.html">
-    <span class="nav-num">03</span>
-    <span class="nav-label">What the Research Confirms</span>
-  </a>
-  <a class="nav-item" href="section4.html">
-    <span class="nav-num">04</span>
-    <span class="nav-label">Explore Your Community</span>
-  </a>
-  <a class="nav-item" href="section5.html">
-    <span class="nav-num">05</span>
-    <span class="nav-label">Classroom Connection</span>
-  </a>
+  <nav class="sidebar-nav">
+    <a class="nav-item" href="index.html">
+      <span class="nav-num">&uarr;</span>
+      <span class="nav-label">Intro &amp; Overview</span>
+    </a>
+    <a class="nav-item" href="section1.html#section1">
+      <span class="nav-num">01</span>
+      <span class="nav-label">Why Your Neighborhood Matters</span>
+      <span class="nav-time">8 min</span>
+    </a>
+    <a class="nav-item" href="section2.html">
+      <span class="nav-num">02</span>
+      <span class="nav-label">Key Concepts</span>
+      <span class="nav-time">8 min</span>
+    </a>
+    <a class="nav-item active" href="section3.html">
+      <span class="nav-num">03</span>
+      <span class="nav-label">What the Research Confirms</span>
+      <span class="nav-time">6 min</span>
+    </a>
+    <a class="nav-item" href="section4.html">
+      <span class="nav-num">04</span>
+      <span class="nav-label">Explore Your Community</span>
+      <span class="nav-time">10 min</span>
+    </a>
+    <a class="nav-item" href="section5.html">
+      <span class="nav-num">05</span>
+      <span class="nav-label">Classroom Connection</span>
+      <span class="nav-time">5 min</span>
+    </a>
+  </nav>
 </aside>
 
-<main class="main">
-
-  <!-- BLOCK 1: Section Header -->
-  <div class="section-header">
-    <div class="block-inner section-header-row">
-      <div class="sh-number">03</div>
-      <div class="sh-center">
-        <div class="sh-label">Section 3 of 5</div>
-        <div class="sh-title">What the Research Confirms</div>
-      </div>
-      <div class="sh-time">6 min</div>
+<section class="section-header">
+  <div class="block-inner section-header-row">
+    <div class="sh-number">03</div>
+    <div class="sh-center">
+      <div class="sh-label">Section 3 of 5</div>
+      <div class="sh-title reveal">What the Research Confirms</div>
     </div>
+    <div class="sh-time reveal">~6 minutes</div>
   </div>
+</section>
 
-  <!-- BLOCK 2: Objective Callout -->
-  <div class="obj-callout">
-    <div class="block-inner">
-      <p>By the end of this section, you'll see the patterns you named in Section 2 reflected in real Canadian data — and you'll have a benchmark to measure your own community against.</p>
-    </div>
+<section class="sage-callout reveal">
+  <div class="block-inner">
+    <div class="callout-quote">By the end of this section, you'll see the patterns you named in Section 2 reflected in real Canadian data &mdash; and you'll have a benchmark to measure your own community against.</div>
   </div>
+</section>
 
-  <!-- BLOCK 3: Reframe Opening -->
-  <div class="opening-block reveal">
-    <div class="block-inner">
-      <h2>What the Research Confirms</h2>
-      <p>These aren't just abstract concepts. In Section 1, you noticed something. Now here's what researchers found when they measured it across five Canadian cities.</p>
-      <p class="source-credit">Nature Canada, 2022 — Urban Forests and Tree Equity in Canadian Cities</p>
-    </div>
+<section class="content-block reveal">
+  <div class="block-inner">
+    <h2>What the Research Confirms</h2>
+    <p>These aren't just abstract concepts. In Section 1, you noticed something. Now here's what researchers found when they measured it across five Canadian cities.</p>
+    <p class="source-credit">Nature Canada, 2022 &mdash; Urban Forests and Tree Equity in Canadian Cities</p>
   </div>
+</section>
 
-  <!-- BLOCK 4: Findings — editorial stat cards -->
-  <div class="findings-section">
-    <div class="block-inner">
+<div class="findings-section">
+  <div class="block-inner">
     <div class="findings-eyebrow">Key Findings</div>
     <div class="findings-grid reveal-stagger">
-
       <div class="finding-card">
         <div class="finding-headline">Consistently Less</div>
-        <div class="finding-body">Low-income neighborhoods have <strong>measurably lower tree canopy</strong> across all five cities studied — Vancouver, Abbotsford, Calgary, Toronto, and Montreal.</div>
+        <div class="finding-body">Low-income neighborhoods have <strong>measurably lower tree canopy</strong> across all five cities studied &mdash; Vancouver, Abbotsford, Calgary, Toronto, and Montreal.</div>
       </div>
-
       <div class="finding-card">
         <div class="finding-headline">Greater Heat Exposure</div>
-        <div class="finding-body">Racialized communities face <strong>disproportionate urban heat island effects</strong> — higher temperatures, more pavement, fewer cooling spaces — than wealthier, whiter neighborhoods.</div>
+        <div class="finding-body">Racialized communities face <strong>disproportionate urban heat island effects</strong> &mdash; higher temperatures, more pavement, fewer cooling spaces &mdash; than wealthier, whiter neighborhoods.</div>
       </div>
-
       <div class="finding-card">
         <div class="finding-headline">By Design, Not Chance</div>
         <div class="finding-body">Three causes: <strong>funding gaps</strong> in underserved areas, <strong>planning processes</strong> that exclude trees, and <strong>weak community engagement</strong>. These patterns reflect decades of policy decisions.</div>
       </div>
-
-    </div>
     </div>
   </div>
+</div>
 
-  <!-- BLOCK 5: Prediction Interaction -->
-  <div class="prediction-block reveal">
-    <div class="block-inner">
-    <div class="prediction-inner">
-
-      <div class="predict-label">Before you see the benchmark —</div>
-
-      <!-- Q1 -->
-      <div class="predict-q">Think about where you live or go to school right now. How many trees can you see from your window or front door?</div>
-      <div class="predict-options" id="q1-opts">
-        <button class="predict-option" onclick="selectPredict(this, 'q1', 0)">0 – 1 trees</button>
-        <button class="predict-option" onclick="selectPredict(this, 'q1', 1)">2 – 3 trees</button>
-        <button class="predict-option" onclick="selectPredict(this, 'q1', 2)">4 – 6 trees</button>
-        <button class="predict-option" onclick="selectPredict(this, 'q1', 3)">More than 6</button>
-      </div>
-
-      <!-- Q2 — hidden until Q1 answered -->
-      <div class="predict-q2-wrap" id="q2-wrap">
-        <div class="predict-divider"></div>
-        <div class="predict-q">And roughly how far are you from the nearest park or green space?</div>
-        <div class="predict-options" id="q2-opts">
-          <button class="predict-option" onclick="selectPredict(this, 'q2', 0)">Under 5 min walk</button>
-          <button class="predict-option" onclick="selectPredict(this, 'q2', 1)">5 – 10 min walk</button>
-          <button class="predict-option" onclick="selectPredict(this, 'q2', 2)">More than 10 min walk</button>
-          <button class="predict-option" onclick="selectPredict(this, 'q2', 3)">I'm not sure</button>
-        </div>
-      </div>
-
-      <!-- Acknowledgement — hidden until Q2 answered -->
-      <div class="predict-ack" id="predict-ack">
-        <div class="predict-divider"></div>
-        <div class="predict-ack-text">Got it. Keep that in mind.</div>
-        <button class="predict-cta" onclick="scrollToBenchmark()">
-          Now see how researchers measure it
-          <span class="cta-arrow"></span>
-        </button>
-      </div>
-
+<div class="prediction-block reveal">
+  <div class="block-inner">
+    <div class="predict-label">Before you see the benchmark &mdash;</div>
+    <div class="predict-q">Think about where you live or go to school right now. How many trees can you see from your window or front door?</div>
+    <div class="predict-options" id="q1-opts">
+      <button class="predict-option" onclick="selectPredict(this, 'q1', 0)">0 &ndash; 1 trees</button>
+      <button class="predict-option" onclick="selectPredict(this, 'q1', 1)">2 &ndash; 3 trees</button>
+      <button class="predict-option" onclick="selectPredict(this, 'q1', 2)">4 &ndash; 6 trees</button>
+      <button class="predict-option" onclick="selectPredict(this, 'q1', 3)">More than 6</button>
     </div>
+    <div class="predict-q2-wrap" id="q2-wrap">
+      <div class="predict-divider"></div>
+      <div class="predict-q">And roughly how far are you from the nearest park or green space?</div>
+      <div class="predict-options" id="q2-opts">
+        <button class="predict-option" onclick="selectPredict(this, 'q2', 0)">Under 5 min walk</button>
+        <button class="predict-option" onclick="selectPredict(this, 'q2', 1)">5 &ndash; 10 min walk</button>
+        <button class="predict-option" onclick="selectPredict(this, 'q2', 2)">More than 10 min walk</button>
+        <button class="predict-option" onclick="selectPredict(this, 'q2', 3)">I'm not sure</button>
+      </div>
+    </div>
+    <div class="predict-ack" id="predict-ack">
+      <div class="predict-divider"></div>
+      <div class="predict-ack-text">Got it. Keep that in mind.</div>
+      <button class="predict-cta" onclick="scrollToBenchmark()">
+        Now see how researchers measure it <span class="cta-arrow"></span>
+      </button>
     </div>
   </div>
+</div>
 
-  <!-- BLOCK 6: 3-30-300 Rule -->
-  <div class="benchmark-section" id="benchmark">
-    <div class="block-inner">
+<div class="benchmark-section" id="benchmark">
+  <div class="block-inner">
     <div class="benchmark-eyebrow reveal">The Benchmark</div>
     <h2 class="benchmark-heading reveal">The 3-30-300 Rule</h2>
-    <p class="benchmark-intro reveal">Researchers proposed a simple benchmark for tree equity — three numbers that every neighborhood should meet. How does yours compare to what you just estimated?</p>
-
+    <p class="benchmark-intro reveal">Researchers proposed a simple benchmark for tree equity &mdash; three numbers that every neighborhood should meet. How does yours compare to what you just estimated?</p>
     <div class="benchmark-grid reveal-stagger">
-
-      <!-- Card 1: 3 trees -->
       <div class="bm-flip" onclick="flipBm(this)">
         <div class="bm-inner">
           <div class="bm-front">
             <div class="bm-number">3</div>
             <div class="bm-unit">trees visible</div>
-            <div class="bm-hint">Flip to explore →</div>
+            <div class="bm-hint">Flip to explore &rarr;</div>
           </div>
           <div class="bm-back">
             <div class="bm-tag">What it means</div>
@@ -904,161 +337,116 @@ body::after {
           </div>
         </div>
       </div>
-
-      <!-- Card 2: 30% -->
       <div class="bm-flip" onclick="flipBm(this)">
         <div class="bm-inner">
           <div class="bm-front">
             <div class="bm-number">30%</div>
             <div class="bm-unit">canopy cover</div>
-            <div class="bm-hint">Flip to explore →</div>
+            <div class="bm-hint">Flip to explore &rarr;</div>
           </div>
           <div class="bm-back">
             <div class="bm-tag">What it means</div>
             <div class="bm-def">At least 30% of your neighborhood's surface area should be covered by tree canopy when viewed from above.</div>
             <div class="bm-tag">Why this number</div>
-            <div class="bm-rationale">At 30% canopy, neighborhoods experience measurable cooling effects, reduced stormwater runoff, and better air quality. Below that threshold, urban heat islands intensify — especially in summer.</div>
+            <div class="bm-rationale">At 30% canopy, neighborhoods experience measurable cooling effects, reduced stormwater runoff, and better air quality. Below that threshold, urban heat islands intensify &mdash; especially in summer.</div>
           </div>
         </div>
       </div>
-
-      <!-- Card 3: 300m -->
       <div class="bm-flip" onclick="flipBm(this)">
         <div class="bm-inner">
           <div class="bm-front">
             <div class="bm-number">300m</div>
             <div class="bm-unit">to green space</div>
-            <div class="bm-hint">Flip to explore →</div>
+            <div class="bm-hint">Flip to explore &rarr;</div>
           </div>
           <div class="bm-back">
             <div class="bm-tag">What it means</div>
-            <div class="bm-def">Everyone should live within 300 metres — roughly a 3–4 minute walk — of a quality green space.</div>
+            <div class="bm-def">Everyone should live within 300 metres &mdash; roughly a 3&ndash;4 minute walk &mdash; of a quality green space.</div>
             <div class="bm-tag">Why this number</div>
             <div class="bm-rationale">300 metres is the distance at which people actually use green spaces regularly. Beyond that, visit frequency drops sharply. Access on paper doesn't translate to access in practice.</div>
           </div>
         </div>
       </div>
-
-    </div>
     </div>
   </div>
+</div>
 
-  <!-- BLOCK 7: Scenario Knowledge Check -->
-  <div class="check-section reveal">
-    <div class="block-inner">
-    <div class="check-inner">
-
-      <div class="check-eyebrow">Apply It</div>
-      <div class="check-title">Let's test the benchmark</div>
-      <div class="check-sub">One scenario. Think it through.</div>
-
-      <!-- Scenario card -->
-      <div class="scenario-card">
-        <div class="scenario-eyebrow">Scenario</div>
-        <div class="scenario-text">Maya Chen lives in an apartment in East Vancouver. From her window, she can see 2 trees. Her neighborhood has 18% tree canopy coverage. The nearest park is 600 metres away.</div>
-        <div class="scenario-tags">
-          <span class="s-tag">2 trees visible</span>
-          <span class="s-tag">18% canopy</span>
-          <span class="s-tag">600m to park</span>
-        </div>
+<div class="check-section reveal">
+  <div class="block-inner">
+    <div class="check-eyebrow">Apply It</div>
+    <div class="check-title">Let's test the benchmark</div>
+    <div class="check-sub">One scenario. Think it through.</div>
+    <div class="scenario-card">
+      <div class="scenario-eyebrow">Scenario</div>
+      <div class="scenario-text">Maya Chen lives in an apartment in East Vancouver. From her window, she can see 2 trees. Her neighborhood has 18% tree canopy coverage. The nearest park is 600 metres away.</div>
+      <div class="scenario-tags">
+        <span class="s-tag">2 trees visible</span>
+        <span class="s-tag">18% canopy</span>
+        <span class="s-tag">600m to park</span>
       </div>
-
-      <!-- Question -->
-      <span class="q-num">Question</span>
-      <div class="q-text">According to the 3-30-300 rule, which benchmark does Maya's neighborhood meet?</div>
-
-      <div class="options">
-        <div class="option" data-val="A" onclick="selectOpt(this)">
-          <div class="opt-radio"><div class="opt-dot"></div></div>
-          <div class="opt-text">None of them</div>
-          <div class="opt-icon"></div>
-        </div>
-        <div class="option" data-val="B" onclick="selectOpt(this)">
-          <div class="opt-radio"><div class="opt-dot"></div></div>
-          <div class="opt-text">Only the trees visible from home</div>
-          <div class="opt-icon"></div>
-        </div>
-        <div class="option" data-val="C" onclick="selectOpt(this)">
-          <div class="opt-radio"><div class="opt-dot"></div></div>
-          <div class="opt-text">Only the canopy percentage</div>
-          <div class="opt-icon"></div>
-        </div>
-        <div class="option" data-val="D" onclick="selectOpt(this)">
-          <div class="opt-radio"><div class="opt-dot"></div></div>
-          <div class="opt-text">All three benchmarks</div>
-          <div class="opt-icon"></div>
-        </div>
+    </div>
+    <span class="q-num">Question</span>
+    <div class="q-text">According to the 3-30-300 rule, which benchmark does Maya's neighborhood meet?</div>
+    <div class="options">
+      <div class="option" data-val="A" onclick="selectOpt(this)">
+        <div class="opt-radio"><div class="opt-dot"></div></div>
+        <div class="opt-text">None of them</div>
+        <div class="opt-icon"></div>
       </div>
-
-      <button class="confirm-btn" id="confirm-btn" onclick="confirmCheck()">Confirm Answer</button>
-
-      <div class="feedback-panel" id="feedback"></div>
-
+      <div class="option" data-val="B" onclick="selectOpt(this)">
+        <div class="opt-radio"><div class="opt-dot"></div></div>
+        <div class="opt-text">Only the trees visible from home</div>
+        <div class="opt-icon"></div>
+      </div>
+      <div class="option" data-val="C" onclick="selectOpt(this)">
+        <div class="opt-radio"><div class="opt-dot"></div></div>
+        <div class="opt-text">Only the canopy percentage</div>
+        <div class="opt-icon"></div>
+      </div>
+      <div class="option" data-val="D" onclick="selectOpt(this)">
+        <div class="opt-radio"><div class="opt-dot"></div></div>
+        <div class="opt-text">All three benchmarks</div>
+        <div class="opt-icon"></div>
+      </div>
     </div>
-    </div>
+    <button class="confirm-btn" id="confirm-btn" onclick="confirmCheck()">Confirm Answer</button>
+    <div class="feedback-panel" id="feedback"></div>
   </div>
+</div>
 
-  <!-- BLOCK 8: Bridge to Section 4 -->
-  <div class="bridge-section reveal">
-    <div class="block-inner">
-    <div class="bridge-row">
-      <div class="bridge-left">
-        <div class="bridge-heading">Maya's neighborhood doesn't meet <em>a single benchmark.</em></div>
-        <div class="bridge-body">Does yours? In Section 4, you'll use a real mapping tool to investigate your own community — and you might be surprised by what you find.</div>
-      </div>
-      <a class="continue-btn" href="section4.html">
-        Section 4: Explore Your Community
-        <span class="btn-arrow"></span>
+<section class="begin-section reveal">
+  <div class="block-inner" style="display:flex; justify-content:space-between; align-items:center; gap:4rem; width:100%; flex-wrap:wrap;">
+    <div class="begin-text">
+      <h2 class="begin-heading">Maya's neighborhood doesn't meet a single benchmark</h2>
+      <p class="begin-sub">Does yours? In Section 4, you'll use a real mapping tool to investigate your own community &mdash; and you might be surprised by what you find.</p>
+    </div>
+    <div class="begin-action">
+      <a class="btn-begin" href="section4.html">
+        Section 4 <span class="arrow"></span>
       </a>
-    </div>
+      <span class="time-note">Next: Explore Your Community</span>
     </div>
   </div>
-
-</main>
+</section>
 
 <script>
-// ── PREDICTION INTERACTION ──
 const predictState = { q1: null, q2: null };
-
 function selectPredict(btn, q, idx) {
-  const opts = document.querySelectorAll(`#${q}-opts .predict-option`);
-  opts.forEach(o => o.classList.remove('selected'));
+  document.querySelectorAll('#' + q + '-opts .predict-option').forEach(o => o.classList.remove('selected'));
   btn.classList.add('selected');
   predictState[q] = idx;
-
-  if (q === 'q1') {
-    setTimeout(() => {
-      const wrap = document.getElementById('q2-wrap');
-      wrap.classList.add('revealed');
-    }, 300);
-  }
-  if (q === 'q2') {
-    setTimeout(() => {
-      const ack = document.getElementById('predict-ack');
-      ack.classList.add('revealed');
-    }, 300);
-  }
+  if (q === 'q1') setTimeout(() => document.getElementById('q2-wrap').classList.add('revealed'), 300);
+  if (q === 'q2') setTimeout(() => document.getElementById('predict-ack').classList.add('revealed'), 300);
 }
+function scrollToBenchmark() { document.getElementById('benchmark').scrollIntoView({ behavior: 'smooth' }); }
+function flipBm(card) { card.classList.toggle('flipped'); }
 
-function scrollToBenchmark() {
-  document.getElementById('benchmark').scrollIntoView({ behavior: 'smooth' });
-}
-
-// ── BENCHMARK FLIP CARDS ──
-function flipBm(card) {
-  card.classList.toggle('flipped');
-}
-
-// ── KNOWLEDGE CHECK ──
 const correct = 'A';
-let selected = null;
-let confirmed = false;
-
+let selected = null, confirmed = false;
 const feedbackText = {
-  correct: `<strong>Exactly right.</strong> Maya's neighborhood misses all three benchmarks — 2 trees (not 3), 18% canopy (not 30%), 600m to a park (not 300m). Her situation isn't unusual. In Section 4, you'll measure your own community using the same rule.`,
-  incorrect: `Check the numbers again. Maya has 2 trees visible (the rule says 3), 18% canopy (the rule says 30%), and her park is 600m away (the rule says 300m). <strong>She misses all three</strong> — and her situation reflects a pattern across Canadian cities.`
+  correct: '<strong>Exactly right.</strong> Maya\'s neighborhood misses all three benchmarks \u2014 2 trees (not 3), 18% canopy (not 30%), 600m to a park (not 300m). Her situation isn\'t unusual. In Section 4, you\'ll measure your own community using the same rule.',
+  incorrect: 'Check the numbers again. Maya has 2 trees visible (the rule says 3), 18% canopy (the rule says 30%), and her park is 600m away (the rule says 300m). <strong>She misses all three</strong> \u2014 and her situation reflects a pattern across Canadian cities.'
 };
-
 function selectOpt(el) {
   if (confirmed) return;
   document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
@@ -1066,53 +454,41 @@ function selectOpt(el) {
   selected = el.dataset.val;
   document.getElementById('confirm-btn').classList.add('visible');
 }
-
 function confirmCheck() {
   if (!selected || confirmed) return;
   confirmed = true;
   const isCorrect = selected === correct;
-
   document.querySelectorAll('.option').forEach(opt => {
-    opt.classList.add('locked');
-    opt.classList.remove('selected');
-    const val = opt.dataset.val;
-    const icon = opt.querySelector('.opt-icon');
-    if (val === correct) {
-      opt.classList.add('correct');
-      icon.textContent = '✓';
-    } else if (val === selected && !isCorrect) {
-      opt.classList.add('incorrect');
-      icon.textContent = '✗';
-    }
+    opt.classList.add('locked'); opt.classList.remove('selected');
+    const val = opt.dataset.val, icon = opt.querySelector('.opt-icon');
+    if (val === correct) { opt.classList.add('correct'); icon.textContent = '\u2713'; }
+    else if (val === selected && !isCorrect) { opt.classList.add('incorrect'); icon.textContent = '\u2717'; }
   });
-
   document.getElementById('confirm-btn').classList.remove('visible');
-
   const fb = document.getElementById('feedback');
-  fb.className = `feedback-panel visible ${isCorrect ? 'correct-fb' : 'incorrect-fb'}`;
-  fb.innerHTML = `
-    <span class="fb-icon">${isCorrect ? '✓' : '→'}</span>
-    <span class="fb-text">${feedbackText[isCorrect ? 'correct' : 'incorrect']}</span>
-  `;
+  fb.className = 'feedback-panel visible ' + (isCorrect ? 'correct-fb' : 'incorrect-fb');
+  fb.innerHTML = '<span class="fb-icon">' + (isCorrect ? '\u2713' : '\u2192') + '</span><span class="fb-text">' + feedbackText[isCorrect ? 'correct' : 'incorrect'] + '</span>';
 }
 
-// ── SCROLL REVEAL ──
-const observer = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-      observer.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.08 });
+window.addEventListener('scroll', () => {
+  const doc = document.documentElement;
+  const max = doc.scrollHeight - doc.clientHeight;
+  const scrolled = max > 0 ? Math.min(doc.scrollTop / max, 1) : 1;
+  document.getElementById('progress-bar').style.transform = 'scaleX(' + scrolled + ')';
+});
 
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.08 });
 document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => observer.observe(el));
 
-// ── PROGRESS BAR ──
-window.addEventListener('scroll', () => {
-  const pct = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
-  document.getElementById('progress').style.width = pct + '%';
-});
+const toggle = document.querySelector('.sidebar-toggle');
+const sidebar = document.querySelector('.sidebar');
+const overlay = document.querySelector('.sidebar-overlay');
+function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('visible'); toggle.classList.add('open'); }
+function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('visible'); toggle.classList.remove('open'); }
+toggle.addEventListener('click', function () { if (sidebar.classList.contains('open')) { closeSidebar(); } else { openSidebar(); } });
+overlay.addEventListener('click', closeSidebar);
 </script>
 </body>
 </html>

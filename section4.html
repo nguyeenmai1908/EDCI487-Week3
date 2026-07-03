@@ -1,1134 +1,405 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Section 4: Explore Your Community — EDCI 487</title>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;700&display=swap" rel="stylesheet" />
-  <style>
-    :root {
-      --forest: #1a2e1a;
-      --near-black: #1c1a14;
-      --moss: #4a6741;
-      --sage: #7a9e6e;
-      --sage-pale: #deebd4;
-      --clay: #c4622d;
-      --ember: #e8874a;
-      --sand: #e8d5b0;
-      --cream: #f5f0e8;
-      --white: #fefcf8;
-      --text: #1a2e1a;
-      --muted: #7a6a5a;
-      --earth: #2a1f14;
-    }
-
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
-
-    body {
-      font-family: "DM Sans", sans-serif;
-      font-weight: 300;
-      background: var(--cream);
-      color: var(--text);
-      overflow-x: hidden;
-    }
-
-    body::after {
-      content: "";
-      position: fixed;
-      inset: 0;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.025'/%3E%3C/svg%3E");
-      pointer-events: none;
-      z-index: 999;
-    }
-
-    .progress-bar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: rgba(26, 46, 26, 0.08);
-      z-index: 200;
-    }
-
-    .progress-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--clay), var(--ember));
-      transition: width 0.15s ease;
-    }
-
-    .sidebar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 220px;
-      height: 100vh;
-      background: #2f4a2f;
-      border-right: 1px solid rgba(122, 158, 110, 0.2);
-      z-index: 100;
-      display: flex;
-      flex-direction: column;
-      padding: 2rem 0;
-      overflow-y: auto;
-    }
-
-    .sidebar-logo {
-      font-size: 0.68rem;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: rgba(122, 158, 110, 0.5);
-      padding: 0 1.5rem 1.5rem;
-      border-bottom: 1px solid rgba(122, 158, 110, 0.1);
-      margin-bottom: 1.5rem;
-      line-height: 1.6;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.6rem;
-      padding: 0.7rem 1.5rem;
-      text-decoration: none;
-      border-left: 3px solid transparent;
-      transition: all 0.2s;
-      cursor: pointer;
-    }
-
-    .nav-item:hover { background: rgba(245, 240, 232, 0.04); }
-    .nav-item.active { border-left-color: var(--clay); }
-
-    .nav-num {
-      font-size: 0.68rem;
-      font-weight: 500;
-      color: rgba(245, 240, 232, 0.25);
-      flex-shrink: 0;
-      margin-top: 2px;
-    }
-
-    .nav-item.active .nav-num { color: var(--clay); }
-
-    .nav-label {
-      font-size: 0.75rem;
-      font-weight: 300;
-      line-height: 1.4;
-      color: rgba(245, 240, 232, 0.35);
-    }
-
-    .nav-item.active .nav-label { color: var(--cream); font-weight: 500; }
-
-    .main {
-      margin-left: 220px;
-      min-height: 100vh;
-    }
-
-    .block-inner {
-      width: min(1080px, 100%);
-      margin: 0 auto;
-    }
-
-    .section-header {
-      background: var(--forest);
-      padding: 2.5rem 3rem;
-    }
-
-    .section-header-row {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-    }
-
-    .sh-number {
-      font-family: "Playfair Display", serif;
-      font-size: 7rem;
-      font-weight: 900;
-      line-height: 1;
-      color: rgba(255, 255, 255, 0.18);
-      flex-shrink: 0;
-      user-select: none;
-    }
-
-    .sh-center { flex: 1; }
-
-    .sh-label {
-      font-size: 0.82rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--clay);
-      margin-bottom: 0.35rem;
-    }
-
-    .sh-title {
-      font-family: "Playfair Display", serif;
-      font-size: 2.2rem;
-      font-weight: 700;
-      color: var(--cream);
-      line-height: 1.25;
-    }
-
-    .sh-time {
-      font-size: 0.78rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: rgba(245, 240, 232, 0.28);
-      flex-shrink: 0;
-      align-self: center;
-    }
-
-    .obj-callout {
-      background: var(--sage-pale);
-      border-left: 3px solid var(--sage);
-      padding: 1.25rem 3rem;
-    }
-
-    .obj-callout p {
-      font-family: "Playfair Display", serif;
-      font-style: italic;
-      font-size: 1rem;
-      color: #2d5a27;
-      line-height: 1.65;
-      max-width: none;
-    }
-
-    .lenses-section {
-      background: var(--forest);
-      padding: 4rem 3rem 4.5rem;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .lenses-section::before {
-      content: "";
-      position: absolute;
-      top: -80px;
-      right: -80px;
-      width: 420px;
-      height: 420px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(122, 158, 110, 0.08), transparent 68%);
-      pointer-events: none;
-    }
-
-    .eyebrow {
-      font-size: 0.82rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--clay);
-      margin-bottom: 0.4rem;
-    }
-
-    .section-heading {
-      font-family: "Playfair Display", serif;
-      font-size: clamp(1.5rem, 2.5vw, 2.1rem);
-      font-weight: 700;
-      line-height: 1.15;
-      color: var(--cream);
-      margin-bottom: 1rem;
-    }
-
-    .section-intro {
-      font-size: 0.88rem;
-      line-height: 1.85;
-      color: rgba(245, 240, 232, 0.7);
-      max-width: 100%;
-      margin-bottom: 2.5rem;
-    }
-
-    .lens-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.25rem;
-      position: relative;
-      z-index: 1;
-    }
-
-    .lens-flip {
-      perspective: 1200px;
-      height: 280px;
-      cursor: pointer;
-    }
-
-    .lens-inner {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-      transform-style: preserve-3d;
-    }
-
-    .lens-flip.flipped .lens-inner { transform: rotateY(180deg); }
-
-    .lens-front, .lens-back {
-      position: absolute;
-      inset: 0;
-      backface-visibility: hidden;
-      -webkit-backface-visibility: hidden;
-      border-radius: 12px;
-      overflow: hidden;
-    }
-
-    .lens-front {
-      background: linear-gradient(180deg, #eaf3e3 0%, #deebd4 100%);
-      border: 1px solid rgba(122, 158, 110, 0.22);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 2rem 1.6rem 2.2rem;
-      position: relative;
-      transition: border-color 0.2s, transform 0.2s;
-    }
-
-    .lens-flip:hover .lens-front {
-      border-color: rgba(122, 158, 110, 0.46);
-      transform: translateY(-2px);
-    }
-
-    .lens-icon {
-      width: 58px;
-      height: 58px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 50%;
-      background: rgba(26, 46, 26, 0.08);
-      color: var(--forest);
-      font-size: 2rem;
-      line-height: 1;
-      margin-bottom: 1.1rem;
-    }
-
-    .lens-term {
-      font-family: "Playfair Display", serif;
-      font-size: 1.5rem;
-      font-weight: 700;
-      line-height: 1.2;
-      color: var(--forest);
-      margin-bottom: 0.65rem;
-    }
-
-    .lens-hint {
-      position: absolute;
-      bottom: 1.05rem;
-      font-size: 0.6rem;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: rgba(26, 46, 26, 0.46);
-    }
-
-    .lens-back {
-      background: var(--white);
-      transform: rotateY(180deg);
-      padding: 1.55rem 1.4rem 1.2rem;
-      border: 1px solid rgba(26, 46, 26, 0.1);
-      display: flex;
-      flex-direction: column;
-      overflow-y: auto;
-    }
-
-    .lens-tag {
-      font-size: 0.56rem;
-      letter-spacing: 0.24em;
-      text-transform: uppercase;
-      color: var(--clay);
-      margin-bottom: 0.35rem;
-      font-weight: 500;
-    }
-
-    .lens-question {
-      font-family: "Playfair Display", serif;
-      font-style: italic;
-      font-size: 1.04rem;
-      line-height: 1.72;
-      color: var(--forest);
-      margin-bottom: 0.9rem;
-    }
-
-    .lens-note {
-      font-size: 0.9rem;
-      line-height: 1.72;
-      color: rgba(26, 46, 26, 0.72);
-      padding-top: 0.7rem;
-      border-top: 1px solid rgba(232, 213, 176, 0.9);
-      margin-top: auto;
-    }
-
-    .task-section {
-      background: var(--cream);
-      padding: 4rem 3rem 4.25rem;
-    }
-
-    .task-heading {
-      font-family: "Playfair Display", serif;
-      font-size: clamp(1.5rem, 2.5vw, 2.1rem);
-      font-weight: 700;
-      line-height: 1.15;
-      color: var(--forest);
-      margin-bottom: 1rem;
-    }
-
-    .task-bridge {
-      border-left: 4px solid var(--clay);
-      padding-left: 1.15rem;
-      margin: 1.5rem 0 2rem;
-      font-family: "Playfair Display", serif;
-      font-style: italic;
-      font-size: 1rem;
-      line-height: 1.75;
-      color: rgba(42, 31, 20, 0.82);
-      max-width: none;
-    }
-
-    .steps-label {
-      font-size: 1rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--clay);
-      margin-bottom: 1.2rem;
-    }
-
-    .steps-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1rem;
-    }
-
-    .step-card {
-      background: var(--white);
-      border: 1px solid rgba(26, 46, 26, 0.08);
-      border-radius: 12px;
-      padding: 1.2rem 1.25rem;
-      box-shadow: 0 12px 28px rgba(26, 46, 26, 0.06);
-    }
-
-    .step-head {
-      display: flex;
-      align-items: center;
-      gap: 0.8rem;
-      margin-bottom: 0.75rem;
-    }
-
-    .step-icon {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      background: rgba(196, 98, 45, 0.12);
-      color: var(--clay);
-      font-size: 0.95rem;
-      font-weight: 700;
-      flex-shrink: 0;
-    }
-
-    .step-number {
-      font-size: 0.76rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--clay);
-      font-weight: 500;
-    }
-
-    .step-text {
-      font-size: 0.98rem;
-      line-height: 1.75;
-      color: rgba(26, 46, 26, 0.78);
-    }
-
-    .step-title {
-      font-weight: 700;
-      letter-spacing: 0.03em;
-    }
-
-    .tip-card {
-      margin-top: 1.2rem;
-      border-left: 3px solid var(--sage);
-      background: rgba(122, 158, 110, 0.08);
-      border-radius: 12px;
-      padding: 1rem 1.1rem 1rem 1.2rem;
-      color: rgba(26, 46, 26, 0.8);
-      line-height: 1.75;
-    }
-
-    .tool-section {
-      background: var(--near-black);
-      padding: 4rem 3rem 4.5rem;
-    }
-
-    .tool-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      gap: 1rem;
-      margin-bottom: 1.4rem;
-    }
-
-    .tool-title {
-      font-family: "Playfair Display", serif;
-      font-size: 1.6rem;
-      line-height: 1.2;
-      color: var(--cream);
-      margin-top: 0.25rem;
-    }
-
-    .tool-url {
-      font-size: 0.88rem;
-      line-height: 1.5;
-      color: rgba(245, 240, 232, 0.4);
-      text-align: right;
-    }
-
-    .tool-frame-wrap {
-      border-radius: 12px;
-      overflow: hidden;
-      border: 1px solid rgba(122, 158, 110, 0.14);
-      background: rgba(255, 255, 255, 0.02);
-    }
-
-    .tool-frame {
-      width: 100%;
-      height: 520px;
-      border: 0;
-      display: block;
-      background: #111;
-    }
-
-    .tool-fallback {
-      display: none;
-      padding: 2.5rem 2rem;
-      text-align: center;
-      background: rgba(255, 255, 255, 0.03);
-      color: rgba(245, 240, 232, 0.78);
-    }
-
-    .tool-fallback-icon {
-      font-size: 2.25rem;
-      margin-bottom: 0.8rem;
-    }
-
-    .tool-fallback p {
-      max-width: 28rem;
-      margin: 0 auto 1.2rem;
-      line-height: 1.75;
-    }
-
-    .tool-link {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.55rem;
-      background: var(--clay);
-      color: var(--white);
-      border-radius: 12px;
-      padding: 0.9rem 1.2rem;
-      text-decoration: none;
-      font-size: 0.84rem;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      transition: background 0.25s ease, transform 0.25s ease;
-    }
-
-    .tool-link:hover { background: var(--ember); transform: translateY(-1px); }
-
-    .tool-note {
-      margin-top: 0.8rem;
-      font-size: 0.88rem;
-      font-style: italic;
-      line-height: 1.7;
-      color: rgba(245, 240, 232, 0.45);
-    }
-
-    .reflect-section {
-      background: var(--sand);
-      padding: 4.25rem 3rem 4.75rem;
-    }
-
-    .reflect-heading {
-      font-family: "Playfair Display", serif;
-      font-size: clamp(1.5rem, 2.5vw, 2.1rem);
-      font-weight: 700;
-      line-height: 1.15;
-      color: var(--earth);
-      margin-bottom: 1rem;
-    }
-
-    .reflect-intro {
-      font-size: 0.88rem;
-      line-height: 1.9;
-      color: rgba(42, 31, 20, 0.8);
-      max-width: none;
-      margin-bottom: 2rem;
-    }
-
-    .question-stack {
-      display: grid;
-      gap: 1.2rem;
-    }
-
-    .question-card {
-      background: var(--white);
-      border-radius: 12px;
-      box-shadow: 0 14px 36px rgba(42, 31, 20, 0.08);
-      padding: 1.4rem 1.45rem 1.3rem;
-    }
-
-    .question-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1rem;
-      margin-bottom: 0.85rem;
-    }
-
-    .question-badge {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 999px;
-      padding: 0.35rem 0.75rem;
-      font-size: 0.74rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      font-weight: 500;
-    }
-
-    .badge-observe { background: rgba(122, 158, 110, 0.16); color: #45653b; }
-    .badge-analyze { background: rgba(196, 98, 45, 0.14); color: #9a4a21; }
-    .badge-apply { background: rgba(232, 135, 74, 0.15); color: #b75f2e; }
-
-    .question-num {
-      font-family: "Playfair Display", serif;
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: rgba(42, 31, 20, 0.28);
-      line-height: 1;
-    }
-
-    .question-text {
-      font-family: "Playfair Display", serif;
-      font-size: 1rem;
-      line-height: 1.55;
-      color: var(--earth);
-      margin-bottom: 0.95rem;
-    }
-
-    .chips {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      margin-bottom: 0.85rem;
-    }
-
-    .chip {
-      border-radius: 999px;
-      padding: 0.3rem 0.72rem;
-      font-size: 0.72rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      background: rgba(42, 31, 20, 0.08);
-      color: rgba(42, 31, 20, 0.72);
-    }
-
-    textarea {
-      width: 100%;
-      min-height: 128px;
-      border: 1px solid rgba(42, 31, 20, 0.12);
-      border-radius: 12px;
-      background: var(--cream);
-      color: var(--earth);
-      padding: 1rem 1.05rem;
-      font: inherit;
-      font-size: 0.98rem;
-      line-height: 1.75;
-      resize: vertical;
-      outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    textarea:focus {
-      border-color: var(--clay);
-      box-shadow: 0 0 0 3px rgba(196, 98, 45, 0.12);
-    }
-
-    textarea::placeholder {
-      color: rgba(42, 31, 20, 0.42);
-    }
-
-    .question-bottom {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      gap: 1rem;
-      margin-top: 0.8rem;
-    }
-
-    .word-count {
-      font-size: 0.82rem;
-      line-height: 1.6;
-      color: rgba(42, 31, 20, 0.48);
-      flex-shrink: 0;
-    }
-
-    .word-count.is-ready { color: #45653b; }
-
-    .private-note {
-      font-size: 0.82rem;
-      line-height: 1.65;
-      color: rgba(42, 31, 20, 0.54);
-      font-style: italic;
-      max-width: none;
-    }
-
-    .bridge-section {
-      background: var(--moss);
-      padding: 5rem 3.5rem;
-      border-top: 1px solid rgba(122, 158, 110, 0.12);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .bridge-section::after {
-      content: "";
-      position: absolute;
-      right: -100px;
-      top: -100px;
-      width: 400px;
-      height: 400px;
-      border-radius: 50%;
-      background: rgba(26, 46, 26, 0.3);
-      pointer-events: none;
-    }
-
-    .bridge-section .block-inner {
-      width: 100%;
-      max-width: none;
-    }
-
-    .bridge-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 3rem;
-      position: relative;
-      z-index: 1;
-      width: 100%;
-    }
-
-    .bridge-left {
-      max-width: 620px;
-      text-align: left;
-    }
-
-    .bridge-hint {
-      font-family: "Playfair Display", serif;
-      font-style: italic;
-      font-size: 1rem;
-      color: var(--sage);
-      line-height: 1.6;
-      margin-bottom: 0.55rem;
-    }
-
-    .bridge-heading {
-      font-family: "Playfair Display", serif;
-      font-style: italic;
-      font-weight: 400;
-      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
-      color: var(--cream);
-      line-height: 1.45;
-      margin-bottom: 1rem;
-    }
-
-    .bridge-body {
-      font-size: 0.95rem;
-      line-height: 1.8;
-      color: rgba(245, 240, 232, 0.55);
-    }
-
-    .continue-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.75rem;
-      background: var(--clay);
-      color: var(--white);
-      border: none;
-      border-radius: 12px;
-      padding: 1rem 2rem;
-      font-family: "DM Sans", sans-serif;
-      font-size: 0.78rem;
-      font-weight: 500;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      cursor: pointer;
-      transition: all 0.25s;
-      flex-shrink: 0;
-      text-decoration: none;
-    }
-
-    .continue-btn:hover { background: var(--ember); transform: translateX(4px); }
-
-    .btn-arrow {
-      width: 18px;
-      height: 1px;
-      background: currentColor;
-      position: relative;
-      transition: width 0.2s;
-      flex-shrink: 0;
-    }
-
-    .continue-btn:hover .btn-arrow { width: 26px; }
-
-    .btn-arrow::after {
-      content: "";
-      position: absolute;
-      right: 0;
-      top: -3px;
-      width: 6px;
-      height: 6px;
-      border-right: 1px solid currentColor;
-      border-top: 1px solid currentColor;
-      transform: rotate(45deg);
-    }
-
-    .reveal {
-      opacity: 0;
-      transform: translateY(18px);
-      transition: opacity 0.65s ease, transform 0.65s ease;
-    }
-
-    .reveal.visible { opacity: 1; transform: translateY(0); }
-
-    .reveal-stagger > * {
-      opacity: 0;
-      transform: translateY(16px);
-      transition: opacity 0.5s ease, transform 0.5s ease;
-    }
-
-    .reveal-stagger.visible > *:nth-child(1) { transition-delay: 0.05s; }
-    .reveal-stagger.visible > *:nth-child(2) { transition-delay: 0.18s; }
-    .reveal-stagger.visible > *:nth-child(3) { transition-delay: 0.31s; }
-    .reveal-stagger.visible > *:nth-child(4) { transition-delay: 0.44s; }
-    .reveal-stagger.visible > * { opacity: 1; transform: translateY(0); }
-
-    @media (max-width: 900px) {
-      .lens-grid,
-      .steps-grid { grid-template-columns: 1fr; }
-      .bridge-row { flex-direction: column; align-items: flex-start; }
-      .tool-header,
-      .question-bottom { flex-direction: column; align-items: flex-start; }
-    }
-
-    @media (max-width: 768px) {
-      .sidebar { display: none; }
-      .main { margin-left: 0; }
-      .section-header, .obj-callout, .lenses-section,
-      .task-section, .tool-section, .reflect-section,
-      .bridge-section { padding-left: 1.5rem; padding-right: 1.5rem; }
-      .section-header-row { align-items: flex-start; }
-      .sh-number { font-size: 4.8rem; }
-      .sh-title { font-size: 1.95rem; }
-      .tool-frame { height: 460px; }
-    }
-  </style>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Section 4: Explore Your Community — EDCI 487 Week 3</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --forest:    #2d5a3f;
+  --near-black:#1c1a14;
+  --moss:      #4a6741;
+  --sage:      #7a9e6e;
+  --sage-pale: #deebd4;
+  --clay:      #c4622d;
+  --ember:     #e8874a;
+  --sand:      #e8d5b0;
+  --cream:     #f5f0e8;
+  --white:     #fefcf8;
+}
+html { scroll-behavior: smooth; }
+body { font-family: 'DM Sans', sans-serif; font-weight: 300; background: var(--cream); color: var(--near-black); min-height: 100vh; overflow-x: hidden; }
+body::after { content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 9999; opacity: 0.035; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 200px 200px; }
+
+#progress-bar { position: fixed; top: 0; left: 0; right: 0; height: 3px; background: linear-gradient(90deg, var(--clay), var(--ember)); transform-origin: left; transform: scaleX(0); transition: transform 0.1s linear; z-index: 1000; }
+
+.sidebar-toggle { position: fixed; top: 1.25rem; left: 1.25rem; z-index: 200; width: 40px; height: 40px; background: rgba(47,74,47,0.9); border: 1px solid rgba(122,158,110,0.25); border-radius: 8px; cursor: pointer; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; padding: 0; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); transition: background 0.2s; }
+.sidebar-toggle:hover { background: rgba(47,74,47,1); }
+.sidebar-toggle .bar { display: block; width: 18px; height: 2px; background: var(--cream); border-radius: 1px; transition: transform 0.3s ease, opacity 0.3s ease; }
+.sidebar-toggle.open .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.sidebar-toggle.open .bar:nth-child(2) { opacity: 0; }
+.sidebar-toggle.open .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+.sidebar-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 140; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+.sidebar-overlay.visible { opacity: 1; pointer-events: auto; }
+.sidebar { position: fixed; top: 0; left: 0; width: 260px; height: 100vh; background: #2f4a2f; border-right: 1px solid rgba(122,158,110,0.2); z-index: 150; display: flex; flex-direction: column; align-items: stretch; padding: 4.5rem 0 2rem; overflow-y: auto; transform: translateX(-100%); transition: transform 0.3s ease; text-align: left; }
+.sidebar.open { transform: translateX(0); }
+.sidebar-logo { font-size: 0.68rem; letter-spacing: 0.22em; text-transform: uppercase; color: rgba(122,158,110,0.5); padding: 0 1rem 1.5rem 2rem; border-bottom: 1px solid rgba(122,158,110,0.1); margin-bottom: 1.5rem; line-height: 1.6; }
+.sidebar-nav { display: flex; flex-direction: column; padding: 0; }
+.nav-item { display: flex; align-items: baseline; gap: 0.5rem; padding: 0.7rem 1rem 0.7rem 2rem; position: relative; text-decoration: none; transition: background 0.2s ease; width: 100%; }
+.nav-item:hover { background: rgba(245,240,232,0.04); }
+.nav-item.active::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px; background: var(--clay); }
+.nav-num { font-size: 0.68rem; font-weight: 500; color: rgba(245,240,232,0.25); width: 1.5rem; flex-shrink: 0; text-align: left; }
+.nav-item.active .nav-num { color: var(--clay); }
+.nav-label { font-size: 0.75rem; font-weight: 300; line-height: 1.4; color: rgba(245,240,232,0.35); flex: 1; min-width: 0; text-align: left; }
+.nav-item.active .nav-label { color: var(--cream); font-weight: 500; }
+.nav-time { font-size: 0.6rem; color: rgba(245,240,232,0.22); letter-spacing: 0.06em; flex-shrink: 0; white-space: nowrap; }
+
+.block-inner { width: min(1080px, 100%); margin: 0 auto; }
+
+.section-header { background: var(--forest); padding: 2.5rem 3rem; }
+.section-header-row { display: flex; align-items: center; gap: 1.5rem; }
+.sh-number { font-family: 'Playfair Display', serif; font-size: 10rem; font-weight: 900; color: rgba(255,255,255,0.2); line-height: 1; flex-shrink: 0; user-select: none; }
+.sh-center { flex: 1; }
+.sh-label { font-size: 1rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--clay); margin-bottom: 0.35rem; }
+.sh-title { font-family: 'Playfair Display', serif; font-size: 2.8rem; font-weight: 700; color: var(--cream); line-height: 1.25; }
+.sh-time { font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(245,240,232,0.28); flex-shrink: 0; align-self: center; }
+
+.sage-callout { background: var(--sage-pale); border-left: 4px solid var(--moss); padding: 1.25rem 3rem; }
+.sage-callout .callout-quote { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.05rem; line-height: 1.85; color: rgba(26,46,26,0.7); }
+
+.reveal { opacity: 0; transform: translateY(20px); transition: opacity 0.55s ease, transform 0.55s ease; }
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-stagger > * { opacity: 0; transform: translateY(16px); transition: opacity 0.5s ease, transform 0.5s ease; }
+.reveal-stagger.visible > *:nth-child(1){transition-delay:0.05s}
+.reveal-stagger.visible > *:nth-child(2){transition-delay:0.18s}
+.reveal-stagger.visible > *:nth-child(3){transition-delay:0.31s}
+.reveal-stagger.visible > *:nth-child(4){transition-delay:0.44s}
+.reveal-stagger.visible > * { opacity: 1; transform: translateY(0); }
+
+/* LENSES */
+.lenses-section { background: var(--forest); padding: 4rem 3rem 4.5rem; position: relative; overflow: hidden; }
+.lenses-section::before { content: ''; position: absolute; top: -80px; right: -80px; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(circle, rgba(122,158,110,0.08), transparent 68%); pointer-events: none; }
+.eyebrow { font-size: 0.82rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--clay); margin-bottom: 0.4rem; }
+.section-heading { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 2.5vw, 2.1rem); font-weight: 700; line-height: 1.15; color: var(--cream); margin-bottom: 1rem; }
+.section-intro { font-size: 0.88rem; line-height: 1.85; color: rgba(245,240,232,0.7); margin-bottom: 2.5rem; }
+.lens-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; position: relative; z-index: 1; }
+.lens-flip { perspective: 1200px; height: 280px; cursor: pointer; }
+.lens-inner { position: relative; width: 100%; height: 100%; transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1); transform-style: preserve-3d; }
+.lens-flip.flipped .lens-inner { transform: rotateY(180deg); }
+.lens-front, .lens-back { position: absolute; inset: 0; backface-visibility: hidden; -webkit-backface-visibility: hidden; border-radius: 12px; overflow: hidden; }
+.lens-front { background: linear-gradient(180deg, #eaf3e3, #deebd4); border: 1px solid rgba(122,158,110,0.22); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 2rem 1.6rem 2.2rem; position: relative; transition: border-color 0.2s, transform 0.2s; }
+.lens-flip:hover .lens-front { border-color: rgba(122,158,110,0.46); transform: translateY(-2px); }
+.lens-icon { width: 58px; height: 58px; display: inline-flex; align-items: center; justify-content: center; border-radius: 50%; background: rgba(26,46,26,0.08); color: var(--forest); font-size: 2rem; line-height: 1; margin-bottom: 1.1rem; }
+.lens-term { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; line-height: 1.2; color: var(--forest); margin-bottom: 0.65rem; }
+.lens-hint { position: absolute; bottom: 1.05rem; font-size: 0.6rem; letter-spacing: 0.16em; text-transform: uppercase; color: rgba(26,46,26,0.46); }
+.lens-back { background: var(--white); transform: rotateY(180deg); padding: 1.55rem 1.4rem 1.2rem; border: 1px solid rgba(26,46,26,0.1); display: flex; flex-direction: column; overflow-y: auto; }
+.lens-tag { font-size: 0.56rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--clay); margin-bottom: 0.35rem; font-weight: 500; }
+.lens-question { font-family: 'Playfair Display', serif; font-style: italic; font-size: 1.04rem; line-height: 1.72; color: var(--forest); margin-bottom: 0.9rem; }
+.lens-note { font-size: 0.9rem; line-height: 1.72; color: rgba(26,46,26,0.72); padding-top: 0.7rem; border-top: 1px solid rgba(232,213,176,0.9); margin-top: auto; }
+
+/* TASK */
+.task-section { background: var(--cream); padding: 4rem 3rem 4.25rem; }
+.task-heading { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 2.5vw, 2.1rem); font-weight: 700; line-height: 1.15; color: var(--forest); margin-bottom: 1rem; }
+.task-bridge { border-left: 4px solid var(--clay); padding-left: 1.15rem; margin: 1.5rem 0 2rem; font-family: 'Playfair Display', serif; font-style: italic; font-size: 1rem; line-height: 1.75; color: rgba(42,31,20,0.82); }
+.steps-label { font-size: 1rem; letter-spacing: 0.08em; text-transform: uppercase; color: var(--clay); margin-bottom: 1.2rem; }
+.steps-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; }
+.step-card { background: var(--white); border: 1px solid rgba(26,46,26,0.08); border-radius: 12px; padding: 1.2rem 1.25rem; box-shadow: 0 12px 28px rgba(26,46,26,0.06); }
+.step-head { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.75rem; }
+.step-icon { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: rgba(196,98,45,0.12); color: var(--clay); font-size: 0.95rem; font-weight: 700; flex-shrink: 0; }
+.step-number { font-size: 0.76rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--clay); font-weight: 500; }
+.step-text { font-size: 0.98rem; line-height: 1.75; color: rgba(26,46,26,0.78); }
+.step-title { font-weight: 700; letter-spacing: 0.03em; }
+.tip-card { margin-top: 1.2rem; border-left: 3px solid var(--sage); background: rgba(122,158,110,0.08); border-radius: 12px; padding: 1rem 1.1rem 1rem 1.2rem; color: rgba(26,46,26,0.8); line-height: 1.75; font-size: 0.95rem; }
+
+/* TOOL */
+.tool-section { background: var(--near-black); padding: 4rem 3rem 4.5rem; }
+.tool-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; margin-bottom: 1.4rem; }
+.tool-title { font-family: 'Playfair Display', serif; font-size: 1.6rem; line-height: 1.2; color: var(--cream); margin-top: 0.25rem; }
+.tool-url { font-size: 0.88rem; line-height: 1.5; color: rgba(245,240,232,0.4); text-align: right; }
+.tool-frame-wrap { border-radius: 12px; overflow: hidden; border: 1px solid rgba(122,158,110,0.14); background: rgba(255,255,255,0.02); }
+.tool-frame { width: 100%; height: 520px; border: 0; display: block; background: #111; }
+.tool-fallback { display: none; padding: 2.5rem 2rem; text-align: center; background: rgba(255,255,255,0.03); color: rgba(245,240,232,0.78); }
+.tool-fallback-icon { font-size: 2.25rem; margin-bottom: 0.8rem; }
+.tool-fallback p { max-width: 28rem; margin: 0 auto 1.2rem; line-height: 1.75; }
+.tool-link { display: inline-flex; align-items: center; gap: 0.55rem; background: var(--clay); color: var(--white); border-radius: 4px; padding: 0.9rem 1.2rem; text-decoration: none; font-size: 0.84rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; transition: background 0.25s; }
+.tool-link:hover { background: var(--ember); }
+.tool-note { margin-top: 0.8rem; font-size: 0.88rem; font-style: italic; line-height: 1.7; color: rgba(245,240,232,0.45); }
+
+/* REFLECT */
+.reflect-section { background: var(--sand); padding: 4.25rem 3rem 4.75rem; }
+.reflect-heading { font-family: 'Playfair Display', serif; font-size: clamp(1.5rem, 2.5vw, 2.1rem); font-weight: 700; line-height: 1.15; color: #2a1f14; margin-bottom: 1rem; }
+.reflect-intro { font-size: 0.88rem; line-height: 1.9; color: rgba(42,31,20,0.8); margin-bottom: 2rem; }
+.question-stack { display: grid; gap: 1.2rem; }
+.question-card { background: var(--white); border-radius: 12px; box-shadow: 0 14px 36px rgba(42,31,20,0.08); padding: 1.4rem 1.45rem 1.3rem; }
+.question-top { display: flex; justify-content: space-between; align-items: center; gap: 1rem; margin-bottom: 0.85rem; }
+.question-badge { display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; padding: 0.35rem 0.75rem; font-size: 0.74rem; letter-spacing: 0.12em; text-transform: uppercase; font-weight: 500; }
+.badge-observe { background: rgba(122,158,110,0.16); color: #45653b; }
+.badge-analyze { background: rgba(196,98,45,0.14); color: #9a4a21; }
+.badge-apply { background: rgba(232,135,74,0.15); color: #b75f2e; }
+.question-num { font-family: 'Playfair Display', serif; font-size: 1.6rem; font-weight: 700; color: rgba(42,31,20,0.28); line-height: 1; }
+.question-text { font-family: 'Playfair Display', serif; font-size: 1rem; line-height: 1.55; color: #2a1f14; margin-bottom: 0.95rem; }
+.chips { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 0.85rem; }
+.chip { border-radius: 999px; padding: 0.3rem 0.72rem; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; background: rgba(42,31,20,0.08); color: rgba(42,31,20,0.72); }
+textarea { width: 100%; min-height: 128px; border: 1px solid rgba(42,31,20,0.12); border-radius: 12px; background: var(--cream); color: #2a1f14; padding: 1rem 1.05rem; font: inherit; font-size: 0.98rem; line-height: 1.75; resize: vertical; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+textarea:focus { border-color: var(--clay); box-shadow: 0 0 0 3px rgba(196,98,45,0.12); }
+textarea::placeholder { color: rgba(42,31,20,0.42); }
+.question-bottom { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-top: 0.8rem; }
+.word-count { font-size: 0.82rem; line-height: 1.6; color: rgba(42,31,20,0.48); flex-shrink: 0; }
+.word-count.is-ready { color: #45653b; }
+.private-note { font-size: 0.82rem; line-height: 1.65; color: rgba(42,31,20,0.54); font-style: italic; }
+
+/* BEGIN CTA */
+.begin-section { background: var(--cream); padding: 4rem 3rem; display: flex; justify-content: space-between; align-items: center; gap: 4rem; }
+.begin-text .begin-heading { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--forest); font-weight: 700; margin-bottom: 0.6rem; }
+.begin-text .begin-sub { font-size: 1rem; line-height: 1.75; color: rgba(26,46,26,0.6); max-width: 480px; }
+.begin-action { display: flex; flex-direction: column; align-items: flex-end; gap: 0.75rem; flex-shrink: 0; }
+.btn-begin { display: inline-flex; align-items: center; gap: 1rem; background: var(--clay); color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 0.85rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; text-decoration: none; padding: 1rem 2rem; border-radius: 4px; transition: background 0.2s; }
+.btn-begin:hover { background: var(--ember); }
+.btn-begin .arrow { width: 20px; height: 1px; background: currentColor; position: relative; transition: width 0.25s; }
+.btn-begin:hover .arrow { width: 28px; }
+.btn-begin .arrow::after { content: ''; position: absolute; right: 0; top: -3px; width: 7px; height: 7px; border-right: 1px solid currentColor; border-top: 1px solid currentColor; transform: rotate(45deg); }
+.time-note { font-size: 0.72rem; letter-spacing: 0.1em; text-transform: uppercase; color: rgba(26,46,26,0.35); }
+
+@media (max-width: 900px) {
+  .lens-grid, .steps-grid { grid-template-columns: 1fr; }
+  .tool-header, .question-bottom { flex-direction: column; align-items: flex-start; }
+}
+@media (max-width: 768px) {
+  .section-header, .sage-callout, .lenses-section, .task-section,
+  .tool-section, .reflect-section, .begin-section { padding-left: 1.5rem; padding-right: 1.5rem; }
+  .sh-number { font-size: 5rem; }
+  .tool-frame { height: 460px; }
+  .begin-section { flex-direction: column; align-items: flex-start; }
+  .begin-action { align-items: flex-start; }
+}
+</style>
 </head>
 <body>
-  <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+<div id="progress-bar"></div>
 
-  <aside class="sidebar" aria-label="Course outline">
-    <div class="sidebar-logo">EDCI 487<br>Climate Change Education<br>Week 3</div>
-    <a class="nav-item" href="week3-intro.html">
-      <span class="nav-num">↑</span>
+<button class="sidebar-toggle" aria-label="Toggle navigation">
+  <span class="bar"></span><span class="bar"></span><span class="bar"></span>
+</button>
+<div class="sidebar-overlay"></div>
+
+<aside class="sidebar">
+  <div class="sidebar-logo">EDCI 487<br>Climate Change Education<br>Week 3</div>
+  <nav class="sidebar-nav">
+    <a class="nav-item" href="index.html">
+      <span class="nav-num">&uarr;</span>
       <span class="nav-label">Intro &amp; Overview</span>
     </a>
     <a class="nav-item" href="section1.html#section1">
       <span class="nav-num">01</span>
       <span class="nav-label">Why Your Neighborhood Matters</span>
+      <span class="nav-time">8 min</span>
     </a>
     <a class="nav-item" href="section2.html">
       <span class="nav-num">02</span>
       <span class="nav-label">Key Concepts</span>
+      <span class="nav-time">8 min</span>
     </a>
     <a class="nav-item" href="section3.html">
       <span class="nav-num">03</span>
       <span class="nav-label">What the Research Confirms</span>
+      <span class="nav-time">6 min</span>
     </a>
     <a class="nav-item active" href="section4.html">
       <span class="nav-num">04</span>
-      <span class="nav-label">See It for Yourself</span>
+      <span class="nav-label">Explore Your Community</span>
+      <span class="nav-time">10 min</span>
     </a>
     <a class="nav-item" href="section5.html">
       <span class="nav-num">05</span>
       <span class="nav-label">Classroom Connection</span>
+      <span class="nav-time">5 min</span>
     </a>
-  </aside>
+  </nav>
+</aside>
 
-  <main class="main">
-    <section class="section-header">
-      <div class="block-inner section-header-row">
-        <div class="sh-number">04</div>
-        <div class="sh-center">
-          <div class="sh-label">Section 4 of 5</div>
-          <h1 class="sh-title">See It for Yourself</h1>
-        </div>
-        <div class="sh-time">10 min</div>
-      </div>
-    </section>
+<section class="section-header">
+  <div class="block-inner section-header-row">
+    <div class="sh-number">04</div>
+    <div class="sh-center">
+      <div class="sh-label">Section 4 of 5</div>
+      <h1 class="sh-title reveal">See It for Yourself</h1>
+    </div>
+    <div class="sh-time reveal">~10 minutes</div>
+  </div>
+</section>
 
-    <section class="obj-callout">
-      <div class="block-inner">
-        <p>By the end of this section, you'll have investigated real tree equity data in a Canadian city — and connected what you see to the concepts and benchmarks you've already learned.</p>
-      </div>
-    </section>
+<section class="sage-callout reveal">
+  <div class="block-inner">
+    <div class="callout-quote">By the end of this section, you'll have investigated real tree equity data in a Canadian city &mdash; and connected what you see to the concepts and benchmarks you've already learned.</div>
+  </div>
+</section>
 
-    <section class="lenses-section reveal">
-      <div class="block-inner">
-        <div class="eyebrow">Three Lenses</div>
-        <h2 class="section-heading">Before you explore</h2>
-        <p class="section-intro">The Nature Canada report proposes three ways to think about tree equity in any community. Keep these lenses in mind as you investigate — they'll shape what you notice and what you look for.</p>
-
-        <div class="lens-grid reveal-stagger">
-          <div class="lens-flip" onclick="flipLens(this)">
-            <div class="lens-inner">
-              <div class="lens-front">
-                <div class="lens-icon">📍</div>
-                <div class="lens-term">Proximity</div>
-                <div class="lens-hint">Flip to explore →</div>
-              </div>
-              <div class="lens-back">
-                <div class="lens-tag">The question it asks</div>
-                <div class="lens-question">How close are trees to where people actually live and work?</div>
-                <div class="lens-note">Look for gaps between neighborhoods. Is green space evenly distributed, or concentrated in certain areas?</div>
-              </div>
-            </div>
+<section class="lenses-section reveal">
+  <div class="block-inner">
+    <div class="eyebrow">Three Lenses</div>
+    <h2 class="section-heading">Before you explore</h2>
+    <p class="section-intro">The Nature Canada report proposes three ways to think about tree equity in any community. Keep these lenses in mind as you investigate &mdash; they'll shape what you notice and what you look for.</p>
+    <div class="lens-grid reveal-stagger">
+      <div class="lens-flip" onclick="flipLens(this)">
+        <div class="lens-inner">
+          <div class="lens-front">
+            <div class="lens-icon">📍</div>
+            <div class="lens-term">Proximity</div>
+            <div class="lens-hint">Flip to explore &rarr;</div>
           </div>
-
-          <div class="lens-flip" onclick="flipLens(this)">
-            <div class="lens-inner">
-              <div class="lens-front">
-                <div class="lens-icon">🌿</div>
-                <div class="lens-term">Quality</div>
-                <div class="lens-hint">Flip to explore →</div>
-              </div>
-              <div class="lens-back">
-                <div class="lens-tag">The question it asks</div>
-                <div class="lens-question">Are the trees healthy? Is the urban forest biodiverse and well-maintained?</div>
-                <div class="lens-note">Not all tree coverage is equal. A few mature trees provide more cooling and air quality benefits than many small saplings.</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="lens-flip" onclick="flipLens(this)">
-            <div class="lens-inner">
-              <div class="lens-front">
-                <div class="lens-icon">🗣️</div>
-                <div class="lens-term">Participation</div>
-                <div class="lens-hint">Flip to explore →</div>
-              </div>
-              <div class="lens-back">
-                <div class="lens-tag">The question it asks</div>
-                <div class="lens-question">Do community members have a meaningful voice in decisions about green spaces?</div>
-                <div class="lens-note">Data can show the gap — but community voice determines whether anything changes. Who gets consulted, and who doesn't?</div>
-              </div>
-            </div>
+          <div class="lens-back">
+            <div class="lens-tag">The question it asks</div>
+            <div class="lens-question">How close are trees to where people actually live and work?</div>
+            <div class="lens-note">Look for gaps between neighborhoods. Is green space evenly distributed, or concentrated in certain areas?</div>
           </div>
         </div>
       </div>
-    </section>
-
-    <section class="task-section reveal">
-      <div class="block-inner">
-        <div class="eyebrow">Your Task</div>
-        <h2 class="task-heading">Now it's your turn.</h2>
-        <div class="task-bridge">In Section 1, you noticed something about a neighborhood. In Section 3, you estimated how yours might measure up. Now you're going to check.</div>
-
-        <div class="steps-label">Four steps</div>
-        <div class="steps-grid reveal-stagger">
-          <div class="step-card">
-            <div class="step-head">
-              <div class="step-icon" aria-hidden="true">1</div>
-              <div class="step-number">Step 1</div>
-            </div>
-            <div class="step-text"><span class="step-title">DEFINE</span> the place you want to examine by opening the healthyplan.city tool in the panel below — or in a new tab if it doesn't load.</div>
+      <div class="lens-flip" onclick="flipLens(this)">
+        <div class="lens-inner">
+          <div class="lens-front">
+            <div class="lens-icon">🌿</div>
+            <div class="lens-term">Quality</div>
+            <div class="lens-hint">Flip to explore &rarr;</div>
           </div>
-          <div class="step-card">
-            <div class="step-head">
-              <div class="step-icon" aria-hidden="true">2</div>
-              <div class="step-number">Step 2</div>
-            </div>
-            <div class="step-text"><span class="step-title">LOCATE</span> Victoria, BC — or your hometown if it's available.</div>
-          </div>
-          <div class="step-card">
-            <div class="step-head">
-              <div class="step-icon" aria-hidden="true">3</div>
-              <div class="step-number">Step 3</div>
-            </div>
-            <div class="step-text"><span class="step-title">RECOGNIZE</span> patterns by finding the tree canopy layer and exploring different neighborhoods. Zoom in. Compare areas.</div>
-          </div>
-          <div class="step-card">
-            <div class="step-head">
-              <div class="step-icon" aria-hidden="true">4</div>
-              <div class="step-number">Step 4</div>
-            </div>
-            <div class="step-text"><span class="step-title">APPLY</span> your observations for about 5 minutes before scrolling to the reflection questions below.</div>
-          </div>
-        </div>
-
-        <div class="tip-card">Compare downtown to residential neighborhoods. Look at areas you recognize. Notice what surprises you — and keep the three lenses above in mind.</div>
-      </div>
-    </section>
-
-    <section class="tool-section reveal">
-      <div class="block-inner">
-        <div class="tool-header">
-          <div>
-            <div class="eyebrow">The Tool</div>
-            <div class="tool-title">healthyplan.city</div>
-          </div>
-          <div class="tool-url">healthyplan.city/en</div>
-        </div>
-
-        <div class="tool-frame-wrap" id="tool-wrap">
-          <iframe
-            id="tool-frame"
-            class="tool-frame"
-            src="https://healthyplan.city/en"
-            title="healthyplan.city — tree equity mapping tool"
-            allow="geolocation"
-            loading="lazy"></iframe>
-
-          <div class="tool-fallback" id="tool-fallback">
-            <div class="tool-fallback-icon">🗺️</div>
-            <p>The tool couldn't load in this panel — open it directly in a new tab to explore.</p>
-            <a class="tool-link" href="https://healthyplan.city/en" target="_blank" rel="noopener noreferrer">Open healthyplan.city ↗</a>
-          </div>
-        </div>
-
-        <div class="tool-note">Tip: if the map is slow to load, give it 10–15 seconds. It's pulling live data.</div>
-      </div>
-    </section>
-
-    <section class="reflect-section reveal">
-      <div class="block-inner">
-        <div class="eyebrow">Reflect</div>
-        <h2 class="reflect-heading">What did you find?</h2>
-        <p class="reflect-intro">Use the three lenses — proximity, quality, participation — to guide your thinking. Move from what you observed, to what might explain it, to what would need to change.</p>
-
-        <div class="question-stack">
-          <div class="question-card reveal">
-            <div class="question-top">
-              <span class="question-badge badge-observe">Observe</span>
-              <span class="question-num">01</span>
-            </div>
-            <div class="question-text">What patterns do you notice? Which areas have more tree coverage? Which have less?</div>
-            <textarea data-counter="observe-count" placeholder="Describe what you saw in the tool — which neighborhoods, what patterns, anything that stood out..."></textarea>
-            <div class="question-bottom">
-              <div class="private-note">Your response won't be submitted — this is just for you, to help you arrive at class with something to say.</div>
-              <div class="word-count" id="observe-count">0 words</div>
-            </div>
-          </div>
-
-          <div class="question-card reveal">
-            <div class="question-top">
-              <span class="question-badge badge-analyze">Analyze</span>
-              <span class="question-num">02</span>
-            </div>
-            <div class="question-text">Do the patterns align with income levels or demographics? What might explain what you're seeing?</div>
-            <textarea data-counter="analyze-count" placeholder="Based on what you know about this city — history, demographics, policy decisions — what could explain the patterns you found?"></textarea>
-            <div class="question-bottom">
-              <div class="private-note">Your response won't be submitted — this is just for you, to help you arrive at class with something to say.</div>
-              <div class="word-count" id="analyze-count">0 words</div>
-            </div>
-          </div>
-
-          <div class="question-card reveal">
-            <div class="question-top">
-              <span class="question-badge badge-apply">Apply</span>
-              <span class="question-num">03</span>
-            </div>
-            <div class="question-text">Pick one neighborhood with low tree coverage. Using the 3-30-300 framework, what would need to change for residents there to have equitable access to urban forest benefits?</div>
-            <div class="chips">
-              <span class="chip">Proximity</span>
-              <span class="chip">Quality</span>
-              <span class="chip">Participation</span>
-              <span class="chip">3-30-300</span>
-            </div>
-            <textarea data-counter="apply-count" placeholder="Name the neighborhood. What does it currently have? What would the benchmark require? What structural changes would make that possible?"></textarea>
-            <div class="question-bottom">
-              <div class="private-note">Your response won't be submitted — this is just for you, to help you arrive at class with something to say.</div>
-              <div class="word-count" id="apply-count">0 words</div>
-            </div>
+          <div class="lens-back">
+            <div class="lens-tag">The question it asks</div>
+            <div class="lens-question">Are the trees healthy? Is the urban forest biodiverse and well-maintained?</div>
+            <div class="lens-note">Not all tree coverage is equal. A few mature trees provide more cooling and air quality benefits than many small saplings.</div>
           </div>
         </div>
       </div>
-    </section>
-
-    <section class="bridge-section reveal">
-      <div class="block-inner">
-        <div class="bridge-row">
-          <div class="bridge-left">
-            <div class="bridge-hint">You've seen it in the data.</div>
-            <div class="bridge-heading">Now let's think about how you'd teach it.</div>
-            <div class="bridge-body">Section 5 connects everything you've learned to your classroom — with concrete strategies for bringing climate justice into your teaching practice.</div>
+      <div class="lens-flip" onclick="flipLens(this)">
+        <div class="lens-inner">
+          <div class="lens-front">
+            <div class="lens-icon">🗣️</div>
+            <div class="lens-term">Participation</div>
+            <div class="lens-hint">Flip to explore &rarr;</div>
           </div>
-          <a class="continue-btn" href="section5.html">
-            Section 5: Classroom Connection
-            <span class="btn-arrow"></span>
-          </a>
+          <div class="lens-back">
+            <div class="lens-tag">The question it asks</div>
+            <div class="lens-question">Do community members have a meaningful voice in decisions about green spaces?</div>
+            <div class="lens-note">Data can show the gap &mdash; but community voice determines whether anything changes. Who gets consulted, and who doesn't?</div>
+          </div>
         </div>
       </div>
-    </section>
-  </main>
+    </div>
+  </div>
+</section>
 
-  <script>
-    function flipLens(card) {
-      card.classList.toggle("flipped");
-    }
+<section class="task-section reveal">
+  <div class="block-inner">
+    <div class="eyebrow">Your Task</div>
+    <h2 class="task-heading">Now it's your turn.</h2>
+    <div class="task-bridge">In Section 1, you noticed something about a neighborhood. In Section 3, you estimated how yours might measure up. Now you're going to check.</div>
+    <div class="steps-label">Four steps</div>
+    <div class="steps-grid reveal-stagger">
+      <div class="step-card">
+        <div class="step-head"><div class="step-icon">1</div><div class="step-number">Step 1</div></div>
+        <div class="step-text"><span class="step-title">DEFINE</span> the place you want to examine by opening the healthyplan.city tool in the panel below &mdash; or in a new tab if it doesn't load.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-head"><div class="step-icon">2</div><div class="step-number">Step 2</div></div>
+        <div class="step-text"><span class="step-title">LOCATE</span> Victoria, BC &mdash; or your hometown if it's available.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-head"><div class="step-icon">3</div><div class="step-number">Step 3</div></div>
+        <div class="step-text"><span class="step-title">RECOGNIZE</span> patterns by finding the tree canopy layer and exploring different neighborhoods. Zoom in. Compare areas.</div>
+      </div>
+      <div class="step-card">
+        <div class="step-head"><div class="step-icon">4</div><div class="step-number">Step 4</div></div>
+        <div class="step-text"><span class="step-title">APPLY</span> your observations for about 5 minutes before scrolling to the reflection questions below.</div>
+      </div>
+    </div>
+    <div class="tip-card">Compare downtown to residential neighborhoods. Look at areas you recognize. Notice what surprises you &mdash; and keep the three lenses above in mind.</div>
+  </div>
+</section>
 
-    let iframeLoaded = false;
-    const toolFrame = document.getElementById("tool-frame");
-    const toolFallback = document.getElementById("tool-fallback");
+<section class="tool-section reveal">
+  <div class="block-inner">
+    <div class="tool-header">
+      <div><div class="eyebrow">The Tool</div><div class="tool-title">healthyplan.city</div></div>
+      <div class="tool-url">healthyplan.city/en</div>
+    </div>
+    <div class="tool-frame-wrap" id="tool-wrap">
+      <iframe id="tool-frame" class="tool-frame" src="https://healthyplan.city/en" title="healthyplan.city — tree equity mapping tool" allow="geolocation" loading="lazy"></iframe>
+      <div class="tool-fallback" id="tool-fallback">
+        <div class="tool-fallback-icon">🗺️</div>
+        <p>The tool couldn't load in this panel &mdash; open it directly in a new tab to explore.</p>
+        <a class="tool-link" href="https://healthyplan.city/en" target="_blank" rel="noopener noreferrer">Open healthyplan.city ↗</a>
+      </div>
+    </div>
+    <div class="tool-note">Tip: if the map is slow to load, give it 10&ndash;15 seconds. It's pulling live data.</div>
+  </div>
+</section>
 
-    toolFrame.addEventListener("load", () => {
-      iframeLoaded = true;
-    });
+<section class="reflect-section reveal">
+  <div class="block-inner">
+    <div class="eyebrow">Reflect</div>
+    <h2 class="reflect-heading">What did you find?</h2>
+    <p class="reflect-intro">Use the three lenses &mdash; proximity, quality, participation &mdash; to guide your thinking. Move from what you observed, to what might explain it, to what would need to change.</p>
+    <div class="question-stack">
+      <div class="question-card reveal">
+        <div class="question-top"><span class="question-badge badge-observe">Observe</span><span class="question-num">01</span></div>
+        <div class="question-text">What patterns do you notice? Which areas have more tree coverage? Which have less?</div>
+        <textarea data-counter="observe-count" placeholder="Describe what you saw in the tool — which neighborhoods, what patterns, anything that stood out..."></textarea>
+        <div class="question-bottom"><div class="private-note">Your response won't be submitted &mdash; this is just for you, to help you arrive at class with something to say.</div><div class="word-count" id="observe-count">0 words</div></div>
+      </div>
+      <div class="question-card reveal">
+        <div class="question-top"><span class="question-badge badge-analyze">Analyze</span><span class="question-num">02</span></div>
+        <div class="question-text">Do the patterns align with income levels or demographics? What might explain what you're seeing?</div>
+        <textarea data-counter="analyze-count" placeholder="Based on what you know about this city — history, demographics, policy decisions — what could explain the patterns you found?"></textarea>
+        <div class="question-bottom"><div class="private-note">Your response won't be submitted &mdash; this is just for you, to help you arrive at class with something to say.</div><div class="word-count" id="analyze-count">0 words</div></div>
+      </div>
+      <div class="question-card reveal">
+        <div class="question-top"><span class="question-badge badge-apply">Apply</span><span class="question-num">03</span></div>
+        <div class="question-text">Pick one neighborhood with low tree coverage. Using the 3-30-300 framework, what would need to change for residents there to have equitable access to urban forest benefits?</div>
+        <div class="chips"><span class="chip">Proximity</span><span class="chip">Quality</span><span class="chip">Participation</span><span class="chip">3-30-300</span></div>
+        <textarea data-counter="apply-count" placeholder="Name the neighborhood. What does it currently have? What would the benchmark require? What structural changes would make that possible?"></textarea>
+        <div class="question-bottom"><div class="private-note">Your response won't be submitted &mdash; this is just for you, to help you arrive at class with something to say.</div><div class="word-count" id="apply-count">0 words</div></div>
+      </div>
+    </div>
+  </div>
+</section>
 
-    setTimeout(() => {
-      if (!iframeLoaded) {
-        toolFrame.style.display = "none";
-        toolFallback.style.display = "block";
-      }
-    }, 8000);
+<section class="begin-section reveal">
+  <div class="block-inner" style="display:flex; justify-content:space-between; align-items:center; gap:4rem; width:100%; flex-wrap:wrap;">
+    <div class="begin-text">
+      <h2 class="begin-heading">You've seen it in the data</h2>
+      <p class="begin-sub">Now let's think about how you'd teach it. Section 5 connects everything you've learned to your classroom.</p>
+    </div>
+    <div class="begin-action">
+      <a class="btn-begin" href="section5.html">Section 5 <span class="arrow"></span></a>
+      <span class="time-note">Next: Classroom Connection</span>
+    </div>
+  </div>
+</section>
 
-    document.querySelectorAll("textarea[data-counter]").forEach((textarea) => {
-      const counter = document.getElementById(textarea.dataset.counter);
-      const updateCount = () => {
-        const value = textarea.value.trim();
-        const words = value ? value.split(/\s+/).length : 0;
-        counter.textContent = `${words} words`;
-        counter.classList.toggle("is-ready", words >= 20);
-      };
+<script>
+function flipLens(card) { card.classList.toggle('flipped'); }
 
-      textarea.addEventListener("input", updateCount);
-      updateCount();
-    });
+let iframeLoaded = false;
+const toolFrame = document.getElementById('tool-frame');
+const toolFallback = document.getElementById('tool-fallback');
+toolFrame.addEventListener('load', () => { iframeLoaded = true; });
+setTimeout(() => { if (!iframeLoaded) { toolFrame.style.display = 'none'; toolFallback.style.display = 'block'; } }, 8000);
 
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add("visible");
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.08 });
+document.querySelectorAll('textarea[data-counter]').forEach(ta => {
+  const counter = document.getElementById(ta.dataset.counter);
+  const update = () => { const v = ta.value.trim(); const w = v ? v.split(/\s+/).length : 0; counter.textContent = w + ' words'; counter.classList.toggle('is-ready', w >= 20); };
+  ta.addEventListener('input', update); update();
+});
 
-    document.querySelectorAll(".reveal, .reveal-stagger").forEach((el) => observer.observe(el));
+window.addEventListener('scroll', () => {
+  const doc = document.documentElement;
+  const max = doc.scrollHeight - doc.clientHeight;
+  const scrolled = max > 0 ? Math.min(doc.scrollTop / max, 1) : 1;
+  document.getElementById('progress-bar').style.transform = 'scaleX(' + scrolled + ')';
+});
 
-    window.addEventListener("scroll", () => {
-      const pct = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
-      document.getElementById("progress").style.width = `${pct}%`;
-    });
-  </script>
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.08 });
+document.querySelectorAll('.reveal, .reveal-stagger').forEach(el => observer.observe(el));
+
+const toggle = document.querySelector('.sidebar-toggle');
+const sidebar = document.querySelector('.sidebar');
+const overlay = document.querySelector('.sidebar-overlay');
+function openSidebar() { sidebar.classList.add('open'); overlay.classList.add('visible'); toggle.classList.add('open'); }
+function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('visible'); toggle.classList.remove('open'); }
+toggle.addEventListener('click', function () { if (sidebar.classList.contains('open')) { closeSidebar(); } else { openSidebar(); } });
+overlay.addEventListener('click', closeSidebar);
+</script>
 </body>
 </html>
